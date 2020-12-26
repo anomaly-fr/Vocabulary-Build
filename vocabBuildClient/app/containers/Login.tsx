@@ -1,4 +1,3 @@
-/* eslint-disable promise/always-return */
 /* eslint-disable prettier/prettier */
 import {
   Typography,
@@ -15,58 +14,125 @@ import {
 import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import Axios from 'axios';
-import HomePage from './HomePage';
 import 'fontsource-roboto';
 import { Theme } from '../constants/theme';
 import { myConsole } from '../constants/constants';
 
-
 const theme = Theme;
-const Login = () => {
+interface Props {
+  setLogged : (log : number) => void
+}
+const Login : React.FC<Props> = () => {
   const history = useHistory();
   const [account, hasAccount] = useState(true);
-  const [email, setEmail] = useState<string>('');
+  const [userEmail, setEmail] = useState<string>('');
+  const [tutorEmail,setTutorEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [cpassword, setCPassword] = useState<string>('');
   const [name, setName] = useState<string>('');
-  const [message,setMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+
+  const [instructor,isInstructor] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const classes = useStyles();
+
+
+
+  const createTutorAccount = () => {
+    // myConsole.log(name)
+    // myConsole.log(email)
+    // myConsole.log(password)
+    Axios.post('http://localhost:3000/api/registerTutor', {
+      tutorEmail,
+      name,
+      password,
+    })
+      .then((response) => {
+        setMessage('Successful')
+        hasAccount(true);
+        return myConsole.log(`resp ${response.data}`);
+        //   history.push('/home');
+      })
+      .catch((error) => {
+        myConsole.log(`Error ${error}`);
+      });
+  };
+
 
   const createAccount = () => {
     // myConsole.log(name)
     // myConsole.log(email)
     // myConsole.log(password)
     Axios.post('http://localhost:3000/api/register', {
-      email,
+      email: userEmail,
       name,
       password,
     })
       .then((response) => {
-        myConsole.log(`resp ${response}`);
-        history.push('/home');
+        setMessage('Successful')
+        hasAccount(true);
+        return myConsole.log(`resp ${response.data}`);
+        //   history.push('/home');
       })
       .catch((error) => {
         myConsole.log(`Error ${error}`);
       });
   };
   const login = () => {
-
-    Axios.get(`http://localhost:3000/api/login/${email}`)
+    setMessage('Logging in');
+    Axios.get(`http://localhost:3000/api/login/${userEmail}`)
       .then((response) => {
-     myConsole.log(response)
-    //  if(response.data == null || response.data === undefined)
-     if(password !== response.data.password)
-     setMessage('Password incorrect');
+        myConsole.log(`Login response ${JSON.stringify(response.data[0])}`)
+        if(response.data[0] === undefined){
+          setMessage('User not found')
+          return;
+        }
+        // eslint-disable-next-line promise/always-return
+        if(response.data[0].password !== password){
+          setMessage('Password incorrect')
+     }
+     else {
+       history.push({
+       pathname: '/home',
+       state: {
+          name : response.data[0].name,
+          email : response.data[0].email
+       }})
+      //  setLogged(1);
+      //  myConsole.log("Wha")
+     }
       })
       .catch((e) => {
         myConsole.log(e);
       });
   };
- useEffect(() => {
-
-
- },[])
+  const loginTutor = () => {
+    setMessage('Logging in');
+    Axios.get(`http://localhost:3000/api/loginTutor/${tutorEmail}`)
+      .then((response) => {
+        myConsole.log(`"RESPONSE "+${response.data[0]}`);
+        if(response.data[0] === undefined)
+        setMessage('User not found');
+        // eslint-disable-next-line promise/always-return
+        if(response.data[0].password !== password){
+          setMessage('Password incorrect')
+     }
+     else {
+       myConsole.log("What")
+       history.push({
+       pathname: '/home',
+       state: {
+          name : response.data[0].name,
+          email : response.data[0].tutor_email
+       }})
+        //setLogged(1);
+      //  myConsole.log("Wha")
+     }
+      })
+      .catch((e) => {
+        myConsole.log(e);
+      });
+  };
   return (
     <ThemeProvider theme={theme}>
       <Grid container component="main" className={classes.root}>
@@ -88,7 +154,30 @@ const Login = () => {
               <Typography component="h1" variant="h5">
                 {account ? 'Sign In' : 'Sign Up'}
               </Typography>
-              <form className={classes.form} noValidate>
+
+              <FormControlLabel
+
+        control={
+          <Checkbox
+            checked={instructor}
+            onChange={() => {
+              isInstructor(!instructor);
+            }}
+            name="checkedB"
+            color="primary"
+          />
+        }
+        label="Instructor?"
+      />
+
+
+
+              <form
+                className={classes.form}
+                onSubmit={() => {
+                  myConsole.log('mdmdm');
+                }}
+              >
                 {!account ? (
                   <TextField
                     size="small"
@@ -114,8 +203,8 @@ const Login = () => {
                   name="email"
                   autoComplete="email"
                   autoFocus
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  value={instructor ? tutorEmail : userEmail}
+                  onChange={(event) => instructor ?  setTutorEmail(event.target.value) : setEmail(event.target.value)}
                 />
                 <TextField
                   size="small"
@@ -149,18 +238,36 @@ const Login = () => {
                         onChange={(event) => setCPassword(event.target.value)}
                       />
                       <Button
-                        type="submit"
                         fullWidth
                         variant="contained"
                         color="primary"
                         onClick={() => {
-                           myConsole.log('Register')
-              //            createAccount();
+                          try {
+                            if (
+                              userEmail === '' ||
+                              password === '' ||
+                              name === '' ||
+                              cpassword === ''
+                            ) {
+                              setMessage('Please enter all fields');
+                            } else if (cpassword !== password) {
+                              setMessage('Passwords do not match');
+                            } if(instructor)
+                              createTutorAccount()
+                              else createAccount()
+                          } catch (e) {
+                            myConsole.log(e);
+                          }
                         }}
                         className={classes.submit}
                       >
                         Create Account
                       </Button>
+                      <Grid container style={{ margin: '2%' }}>
+                        <Typography style={{ color: 'red' }}>
+                          {message}
+                        </Typography>
+                      </Grid>
                     </Grid>
 
                     <Grid container>
@@ -178,26 +285,29 @@ const Login = () => {
                     <Grid container>
                       <Button
                         style={{ flex: 1 }}
-                        type="submit"
+                        // type="submit"
                         fullWidth
                         variant="contained"
                         color="primary"
                         className={classes.submit}
                         onClick={() => {
-      if(email === '' || password === ''){
-      setMessage('Please enter all fields');
-
-
-    }else{
-      login();
-
-    }
+                          if (((!instructor && userEmail === '') || password === '')||((instructor && tutorEmail === '') || password === '')) {
+                            setMessage('Please enter all fields');
+                          } else {
+                            // eslint-disable-next-line no-lonely-if
+                            if(!instructor)
+                            login();
+                            else
+                             loginTutor();
+                          }
                         }}
                       >
                         Sign In
                       </Button>
-                      <Grid container style={{margin: '2%'}}>
-                        <Typography style={{color: 'red'}}>{message}</Typography>
+                      <Grid container style={{ margin: '2%' }}>
+                        <Typography style={{ color: 'red' }}>
+                          {message}
+                        </Typography>
                       </Grid>
                     </Grid>
 

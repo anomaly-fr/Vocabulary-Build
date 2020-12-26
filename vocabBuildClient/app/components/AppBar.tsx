@@ -75,8 +75,14 @@ const useStyles = makeStyles({
   }
 });
 
+interface Props {
+  name : string,
+  levelNo : number
 
-export default function TopBar(levelNo : number) {
+}
+
+
+const TopBar : React.FC<Props> = ({levelNo,name}) => {
  // myConsole.log(JSON.stringify(levelNo))
   const classes = useStyles();
   return (
@@ -94,9 +100,9 @@ export default function TopBar(levelNo : number) {
       >
         <Grid container justify="center" alignItems="center">
           <Grid container direction="row" alignItems="center">
-            <Avatar>A</Avatar>
+            <Avatar>{name.substring(0,1)}</Avatar>
             {/* <Button>A</Button> */}
-           <Typography style={{margin: '2%'}}>Anam Ali</Typography>
+           <Typography style={{margin: '2%'}}>{name}</Typography>
           </Grid>
         </Grid>
 
@@ -128,3 +134,4 @@ export default function TopBar(levelNo : number) {
   );
 }
 
+export default TopBar;

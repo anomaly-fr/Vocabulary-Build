@@ -31,6 +31,7 @@ app.post("/api/register",(req,res) => {
     db.query(sqlInsert,[email,name,password],(error,result) => {
             console.log("Result "+result);
             console.log('Error '+error)
+            res.json(result);
     })
   //  res.send(result)
 
@@ -38,16 +39,52 @@ app.post("/api/register",(req,res) => {
 
 
 // Login
-app.get("/api/login/:email",(req,res) => {
+app.get("/api/login/:userEmail",(req,res) => {
     const sqlSelect = "SELECT * FROM tutees WHERE email=?";
-    const email = req.params.email;
+    const email = req.params.userEmail;
+    console.log("Req pars email "+email)
     db.query(sqlSelect,[email],(error,result) => {
+        console.log("Req pars useremail "+req.params.userEmail);
+
         console.log("Result " +result);
-        console.log("Error "+error)
-        res.send(result);
+        console.log("Error "+error);
+        console.log(result);
+        
+
+         res.json(result);
     })
 
-})
+});
+
+// register tutor
+app.post("/api/registerTutor",(req,res) => {
+    const name = req.body.name;
+    const tutorEmail = req.body.tutorEmail;
+    const password = req.body.password;
+   // console.log("email "+email)
+
+    const sqlInsert = "INSERT INTO tutor (tutor_email,name,password) VALUES (?,?,?)";
+    db.query(sqlInsert,[tutorEmail,name,password],(error,result) => {
+            console.log("Result "+result);
+            console.log('Error '+error)
+            res.json(result);
+    })
+  //  res.send(result)
+
+});
+
+app.get("/api/loginTutor/:tutorEmail",(req,res) => {
+    console.log("body "+req.body);
+    const sqlSelect = "SELECT * FROM tutor WHERE tutor_email=?";
+    const tutor_email = req.params.tutorEmail;
+    db.query(sqlSelect,[tutor_email],(error,result) => {
+        console.log("Result " +result);
+        console.log("Error "+error);
+        
+         res.json(result);
+    })
+
+});
 
 app.listen(3000, () => {
 
