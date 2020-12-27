@@ -96,7 +96,8 @@ const Login : React.FC<Props> = () => {
        pathname: '/home',
        state: {
           name : response.data[0].name,
-          email : response.data[0].email
+          email : response.data[0].email,
+          userType : 'tutee'
        }})
       //  setLogged(1);
       //  myConsole.log("Wha")
@@ -123,7 +124,9 @@ const Login : React.FC<Props> = () => {
        pathname: '/home',
        state: {
           name : response.data[0].name,
-          email : response.data[0].tutor_email
+          email : response.data[0].tutor_email,
+          userType : 'tutor'
+
        }})
         //setLogged(1);
       //  myConsole.log("Wha")

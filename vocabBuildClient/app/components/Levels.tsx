@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+/* eslint-disable no-lone-blocks */
+import React, { useEffect, useState } from 'react';
 
 import {
   makeStyles,
@@ -13,6 +14,9 @@ import {
 import { useSpring, animated } from 'react-spring';
 import { myConsole } from '../constants/constants';
 import { Theme } from '../constants/theme';
+
+import Axios from 'axios';
+import { levels } from 'electron-log';
 
 const levelDimensions = {
   width: window.innerWidth / 6,
@@ -70,43 +74,20 @@ const useStyles = makeStyles({
 
 interface Props {
   setLevel: (level: number) => void;
-  setSet: (set: number) => void;
+  setSet: (set: string) => void;
+  instructorEmail: string;
 }
-const Levels: React.FC<Props> = ({ setLevel, setSet }) => {
+const Levels: React.FC<Props> = ({ setLevel, setSet, instructorEmail }) => {
   const [level, selLevel] = useState<number>(0);
+  const [levelsFetched, setLevelsFetched] = useState([]);
+  const [randomData, setRandomData] = useState(0);
+  const [sets,setSets] = useState([]);
 
-  const level1AnimationProps = useSpring({
-    marginTop: level === 1 ? 10 : 100,
-    from: { marginTop: 100 },
-  });
-  const level2AnimationProps = useSpring({
-    marginTop: level === 2 ? 10 : 100,
-    from: { marginTop: 100 },
-  });
-  const level3AnimationProps = useSpring({
-    marginTop: level === 3 ? 10 : 100,
-    from: { marginTop: 100 },
-  });
 
-  const sets1AnimationProps = useSpring({
-    to: { opacity: level === 1 ? 1 : 0 },
-  });
-  const sets2AnimationProps = useSpring({
-    to: { opacity: level === 2 ? 1 : 0 },
-  });
-  const sets3AnimationProps = useSpring({
-    to: { opacity: level === 3 ? 1 : 0 },
-  });
 
   const [hover1, isHovered1] = useState<boolean>(false);
-  const [hover2, isHovered2] = useState<boolean>(false);
-  const [hover3, isHovered3] = useState<boolean>(false);
 
   // For sets
-  const [card1Hovered, isCard1Hovered] = useState<boolean>(false);
-  const [card2Hovered, isCard2Hovered] = useState<boolean>(false);
-  const [card3Hovered, isCard3Hovered] = useState<boolean>(false);
-
   const [cardHovered, setCardHovered] = useState<number>(0);
 
   const card1AnimationProps = useSpring({
@@ -121,47 +102,61 @@ const Levels: React.FC<Props> = ({ setLevel, setSet }) => {
 
   //  const [level,setLevel] = useState<number>(0)
 
+  const getLevels = () => {
+    myConsole.log('Fetching levels');
+    Axios.get(`http://localhost:3000/api/getLevelsByTutor/${instructorEmail}`)
+      .then((response) => {
+        const arr = response.data;
+        let i;
+        for (i in arr) {
+          arr[i] = {
+            ...arr[i],
+            id: false,
+          };
+        }
+        setLevelsFetched(arr);
+        return myConsole.log(`Levels ${response.data}`);
+      })
+      .catch((e) => {
+        myConsole.log(e);
+      });
+  };
+
+  const getSets = (levelNo) => {
+    myConsole.log('Fetching Sets');
+    Axios.get(`http://localhost:3000/api/getSetsByLevelNo/${levelNo}`)
+      .then((response) => {
+        const arr = response.data;
+        let i;
+        for (i in arr) {
+          arr[i] = {
+            ...arr[i],
+            id: false,
+          };
+        }
+        setSets(arr);
+        return myConsole.log(`Sets ${response.data}`);
+      })
+      .catch((e) => {
+        myConsole.log(e);
+      });
+  };
+
+  useEffect(() => {
+    getLevels();
+  }, [instructorEmail]);
+
   const classes = useStyles();
 
   const AnimatedGrid = animated(Grid);
   const AnimatedText = animated(Typography);
   const AnimatedCard = animated(Card);
 
-  const sets = ['Set 1', 'Set 2', 'Set 3'];
 
   const hoverEffect = (set: string) => {
     if (set === 'Set 1') setCardHovered(1);
     else if (set === 'Set 2') setCardHovered(2);
     else if (set === 'Set 3') setCardHovered(3);
-    // if(set === 'Set 1'){
-    //   isCard1Hovered(true)
-    //   isCard2Hovered(false)
-    //   isCard3Hovered(false)
-    //   myConsole.log(
-    //  `Current set :    ${set}
-    //     Set 1 : ${card1Hovered} Set 2 : ${card2Hovered} Set 3 :${card3Hovered}`
-    //   )
-
-    // }
-    // else if(set === 'Set 2'){
-    //   isCard2Hovered(true)
-    //   isCard1Hovered(false)
-    //   isCard3Hovered(false)
-    //   myConsole.log(
-    //     `Current set :    ${set}
-    //        Set 1 : ${card1Hovered} Set 2 : ${card2Hovered} Set 3 :${card3Hovered}`
-    //      )
-
-    // }
-    // else {
-    //   isCard3Hovered(true)
-    //   isCard1Hovered(false)
-    //       isCard2Hovered(false)
-    //       myConsole.log(
-    //         `Current set :    ${set}
-    //            Set 1 : ${card1Hovered} Set 2 : ${card2Hovered} Set 3 :${card3Hovered}`
-    //          )
-    // }
   };
 
   const restore = (set: string) => {
@@ -187,7 +182,7 @@ const Levels: React.FC<Props> = ({ setLevel, setSet }) => {
         <Grid
           direction="row"
           className={classes.set}
-          key={set.toString()}
+          key={set.set_name.toString()}
           container
         >
           <AnimatedCard
@@ -196,13 +191,11 @@ const Levels: React.FC<Props> = ({ setLevel, setSet }) => {
             style={resolveSets(set.toString())}
             className={classes.card}
             onClick={() => {
-              const s = set.substring(4);
-              myConsole.log(typeof(parseInt(s)));
-              setSet(parseInt(s));
+              // setSet(set);
             }}
           >
             <Typography style={{ color: theme.palette.primary.light }}>
-              {set.toString()}
+              {set.set_name}
             </Typography>
           </AnimatedCard>
         </Grid>
@@ -210,6 +203,7 @@ const Levels: React.FC<Props> = ({ setLevel, setSet }) => {
     });
   };
   // myConsole.log('Hello World!');
+
   return (
     <ThemeProvider theme={theme}>
       <Grid
@@ -219,88 +213,47 @@ const Levels: React.FC<Props> = ({ setLevel, setSet }) => {
         direction="row"
         spacing={10}
       >
-        <Box
-          border={6}
-          borderRadius={26}
-          borderColor={hover1 ? theme.palette.primary.dark : 'transparent'}
-        >
-          <Grid
-            container
-            onMouseEnter={() => isHovered1(true)}
-            onMouseLeave={() => isHovered1(false)}
-            onClick={() => {
-              setLevel(1);
-              selLevel(1);
-              // myConsole.log('I work')
-            }}
-            className={classes.level}
+        {levelsFetched.map((lev, inx) => (
+          <Box
+            key={inx.toString()}
+            border={6}
+            borderRadius={26}
+            borderColor={lev.id ? theme.palette.primary.dark : 'transparent'}
           >
-            <AnimatedText style={level1AnimationProps} className={classes.text}>
-              Level 1
-            </AnimatedText>
-            <AnimatedGrid
-              style={sets1AnimationProps}
-              className={classes.set}
+            <Grid
               container
+              onMouseEnter={() => isHovered1(true)}
+              onMouseLeave={() => isHovered1(false)}
+              onClick={() => {
+
+                for(let i in levelsFetched){
+                   levelsFetched[i].id = false;
+                }
+                lev.id = !lev.id;
+                getSets(lev.level_no);
+                setRandomData(Math.random());
+                // setLevel(1);
+                // selLevel(1);
+                // myConsole.log('I work')
+              }}
+              className={classes.level}
             >
-              <Grid container>{renderSets()}</Grid>
-            </AnimatedGrid>
-          </Grid>
-        </Box>
-        <Box
-          border={6}
-          borderRadius={26}
-          borderColor={hover2 ? theme.palette.primary.dark : 'transparent'}
-        >
-          <Grid
-            container
-            onMouseEnter={() => isHovered2(true)}
-            onMouseLeave={() => isHovered2(false)}
-            onClick={() => {
-              setLevel(2);
-              selLevel(2);
-            }}
-            className={classes.level}
-          >
-            <AnimatedText style={level2AnimationProps} className={classes.text}>
-              Level 2
-            </AnimatedText>
-            <AnimatedGrid
-              style={sets2AnimationProps}
-              className={classes.set}
-              container
-            >
-              <Grid container>{renderSets()}</Grid>
-            </AnimatedGrid>
-          </Grid>
-        </Box>
-        <Box
-          border={6}
-          borderRadius={26}
-          borderColor={hover3 ? theme.palette.primary.dark : 'transparent'}
-        >
-          <Grid
-            container
-            onMouseEnter={() => isHovered3(true)}
-            onMouseLeave={() => isHovered3(false)}
-            onClick={() => {
-              setLevel(3);
-              selLevel(3);
-            }}
-            className={classes.level}
-          >
-            <AnimatedText style={level3AnimationProps} className={classes.text}>
-              Level 3
-            </AnimatedText>
-            <AnimatedGrid
-              style={sets3AnimationProps}
-              className={classes.set}
-              container
-            >
-              <Grid container>{renderSets()}</Grid>
-            </AnimatedGrid>
-          </Grid>
-        </Box>
+              <AnimatedText
+                style={{ marginTop: lev.id ? 10 : 100 }}
+                className={classes.text}
+              >
+                {lev.level_name}
+              </AnimatedText>
+              <AnimatedGrid
+                style={{ opacity: lev.id ? 1 : 0 }}
+                className={classes.set}
+                container
+              >
+                <Grid container>{renderSets()}</Grid>
+              </AnimatedGrid>
+            </Grid>
+          </Box>
+        ))}
       </Grid>
     </ThemeProvider>
   );

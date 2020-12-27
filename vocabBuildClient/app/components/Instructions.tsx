@@ -11,9 +11,11 @@ import GraphicEqIcon from '@material-ui/icons/GraphicEq';
 import ContactSupportIcon from '@material-ui/icons/ContactSupport';
 import { Link } from 'react-router-dom';
 import { Theme } from '../constants/theme';
+import AudioCard from './AudioCard';
 
 interface Props {
   round: number;
+  setCurrentRound: (r: number) => void;
 }
 
 const useStyles = makeStyles({
@@ -33,7 +35,7 @@ const useStyles = makeStyles({
 
 const theme = Theme;
 
-const Instructions: React.FC<Props> = ({ round }) => {
+const Instructions: React.FC<Props> = ({ round, setCurrentRound }) => {
   //  myConsole.log(JSON.stringify(round))
   const classes = useStyles();
   return (
@@ -50,23 +52,24 @@ const Instructions: React.FC<Props> = ({ round }) => {
             meanings of the words.
           </Typography>
         ) : null}
-        <Link style={{ textDecoration: 'none' }} to="/audio">
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            endIcon={
-              round === 1 ? (
-                <GraphicEqIcon style={{ color: 'white' }} />
-              ) : (
-                <ContactSupportIcon style={{ color: 'white' }} />
-              )
-            }
-          >
-            {round === 1 ? 'Begin Audio Round' : 'Begin Quiz Round'}
-          </Button>
-        </Link>
+        <Button
+          onClick={() => {
+            setCurrentRound(1);
+          }}
+          type="submit"
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          endIcon={
+            round === 1 ? (
+              <GraphicEqIcon style={{ color: 'white' }} />
+            ) : (
+              <ContactSupportIcon style={{ color: 'white' }} />
+            )
+          }
+        >
+          {round === 1 ? 'Begin Audio Round' : 'Begin Quiz Round'}
+        </Button>
       </Grid>
     </ThemeProvider>
   );

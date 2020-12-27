@@ -76,8 +76,8 @@ const useStyles = makeStyles({
 });
 
 interface Props {
-  name : string,
-  levelNo : number
+  name ?: string,
+  levelNo ?: number
 
 }
 
@@ -100,7 +100,7 @@ const TopBar : React.FC<Props> = ({levelNo,name}) => {
       >
         <Grid container justify="center" alignItems="center">
           <Grid container direction="row" alignItems="center">
-            <Avatar>{name.substring(0,1)}</Avatar>
+            <Avatar>{name.substring(0,1).toUpperCase()}</Avatar>
             {/* <Button>A</Button> */}
            <Typography style={{margin: '2%'}}>{name}</Typography>
           </Grid>

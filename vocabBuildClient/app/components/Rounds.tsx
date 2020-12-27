@@ -19,13 +19,14 @@ import MenuBookIcon from '@material-ui/icons/MenuBook';
 import { myConsole } from '../constants/constants';
 import { Theme } from '../constants/theme';
 import Instructions from './Instructions';
+import AudioCard from './AudioCard';
 
 const theme = Theme;
 
 interface Props {
-  // levelNo : number,
-  // setNo : number,
-  setSet: (set: number) => void;
+  levelNo : number,
+  setNo : string,
+  setSet: (set: string) => void;
   setRound: (round: number) => void;
 }
 
@@ -36,6 +37,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
     justifyContent: 'center',
     width: window.innerWidth,
+  //  backgroundColor: 'pink'
   },
   card: {
     flex: 1,
@@ -70,21 +72,27 @@ const useStyles = makeStyles({
   }
 });
 
-const Rounds: React.FC<Props> = ({ setRound, setSet }) => {
+const Rounds: React.FC<Props> = ({ setRound, setSet ,levelNo,setNo }) => {
 
   const [hover1, is1hovered] = useState<boolean>(false);
   const [hover2, is2hovered] = useState<boolean>(false);
   const [hover3, is3hovered] = useState<boolean>(false);
 
   const [round, selRound] = useState<number>(0);
+  const [currentRound,setCurrentRound] = useState<number>(0);
 
-  // myConsole.log(`Shows ${levelNo} ${setNo}`)
+  const setCurrentRoundFunction = (r: number) => {
+    setCurrentRound(r);
+  }
+
+  myConsole.log(`Shows ${levelNo} ${setNo}`)
   const classes = useStyles();
+  if(currentRound === 0)
   return (
     <ThemeProvider theme={theme}>
       <Grid container className={classes.container}>
         <Grid container style={{ margin: '1%' }}>
-          <Typography onClick={() => setSet(0)} style={{ color: 'white' }}>
+          <Typography onClick={() => setSet('')} style={{ color: 'white' }}>
             Back
           </Typography>
         </Grid>
@@ -153,38 +161,17 @@ const Rounds: React.FC<Props> = ({ setRound, setSet }) => {
             </Card>
           </Box>
         </Grid>
-        {/* <Grid container className={classes.cardAlign}>
-    <Box border={6} borderColor={hover3 ? theme.palette.primary.dark : 'transparent'}>
-         <Card
-       className={classes.card}
-       onClick={() =>setRound(1)}
-      // style={{flex:1,     height : window.innerHeight/3,
-      // }}
 
-       border={6}
-       borderRadius={26}
-
-       onMouseEnter={() => is3hovered(true)}
-       onMouseLeave={() => is3hovered(false)}
-
-       >
-         <Grid direction='row' item className={classes.triangle}>
-         <Typography style={{alignSelf: 'center',color: 'white'}} variant='h6'>Audio</Typography>
-
-         </Grid>
-
-      </Card>
-        </Box>
-
-    </Grid>
- */}
    <Grid style={{marginTop: '25vh'}}/>
 
-   {round !== 0 ?<Grid container className={classes.instructions} style={fadeProps}>
-      <Instructions round={round}/></Grid> : null}
+   {round !== 0 ?<Grid container className={classes.instructions}>
+      <Instructions setCurrentRound={setCurrentRoundFunction} round={round}/>
+      </Grid> : null}
       </Grid>
     </ThemeProvider>
-  );
+  )
+
+  return(<AudioCard setCurrentRound={setCurrentRoundFunction} />)
 };
 
 export default Rounds;

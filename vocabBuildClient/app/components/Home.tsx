@@ -7,14 +7,16 @@ import Levels from './Levels';
 import Rounds from './Rounds';
 import {myConsole} from '../constants/constants';
 import Login from '../containers/Login';
+import ChooseInstructor from './ChooseInstructor';
 
 export default function Home() {
   const location = useLocation();
 
   const history = useHistory();
 
+  const [instructorChosen,setInstructorChosen] = useState<string>('');
   const [currentLevel,setCurrentLevel] = useState<number>(0);
-  const [currentSet,setCurrentSet] = useState<number>(0);
+  const [currentSet,setCurrentSet] = useState<string>('');
   const [currentRound,setCurrentRound] = useState<number>(0);
   const [loggedIn,setIsLoggedIn] = useState<number>(0);  // 0 not logged, 1 logged
 
@@ -34,7 +36,7 @@ export default function Home() {
     setCurrentLevel(level)
   }
 
-  const setSet = (set : number) => {
+  const setSet = (set : string) => {
 
     myConsole.log(`Seth ${set}`)
     setCurrentSet(set)
@@ -43,6 +45,7 @@ export default function Home() {
   const setRound = (round : number) => {
     setCurrentRound(round);
   }
+  if(instructorChosen)
   return (
 
     <Grid container>
@@ -56,12 +59,12 @@ export default function Home() {
      </Grid>
 
 
-   {currentSet === 0 ? <Grid container style={{marginTop: '20vh'}}>
-     <Levels setLevel={setLevel} setSet={setSet} />
+   {currentSet === '' ? <Grid container style={{marginTop: '20vh'}}>
+     <Levels instructorEmail={instructorChosen} setLevel={setLevel} setSet={setSet} />
 
 
     </Grid>:<Grid container style={{marginTop: '20vh',alignItems: 'center',justifyContent: 'center'}}>
-    <Rounds setRound={setRound} setSet={setSet} />
+    <Rounds levelNo={currentLevel} setNo={currentSet} setRound={setRound} setSet={setSet} />
 
     </Grid>
 }
@@ -69,7 +72,7 @@ export default function Home() {
       </Grid>
 
   );
-  // return(<Login setLogged={setLogged} />)
+  return(<ChooseInstructor setInstructor={setInstructorChosen} />)
 }
 
 

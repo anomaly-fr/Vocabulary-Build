@@ -7,16 +7,12 @@ import {
   ThemeProvider,
   Typography,
   Button,
-  InputBase,
   TextField
 } from '@material-ui/core';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import { useSpeechSynthesis } from 'react-speech-kit';
-import { Link } from 'react-router-dom';
 import { Theme } from '../constants/theme';
-import { myConsole } from '../constants/constants';
 
 
 const theme=Theme;
@@ -74,18 +70,18 @@ backgroundColor: 'white'
 });
 
 interface Props {
-  // setRound = (round : number) => void
+   setCurrentRound : (r : number) => void;
 }
 
 const words = ["Access","Repository","Enhance","Mystical"];
 
 
 
-const AudioCard: React.FC<Props> = () => {
+const AudioCard: React.FC<Props> = ({setCurrentRound}) => {
   const [spelling,setSpelling] = useState('')
   const [questionNumber,setQuestionNumber] = useState<number>(1);
-  const [show,setShow] = useState(true)
-  const { speak,voices,pitch,rate } = useSpeechSynthesis();
+  const [,setShow] = useState(true)
+  const { speak,voices } = useSpeechSynthesis();
   const classes = useStyles();
   // myConsole.log(voices.length)
 
@@ -98,11 +94,12 @@ const validate = () => {
   return(<ThemeProvider theme={theme}>
 
  <Grid container style={{ margin: '1%' }}>
-   <Link to="/home" style={{textDecoration:"none"}}>
-   <Typography onClick={() => setRound(0)} style={{ color: 'white' }}>
+   <Typography onClick={()=>{
+    setCurrentRound(0);
+
+   }} style={{ color: 'white' }}>
             Back
           </Typography>
-   </Link>
 
         </Grid>
 
