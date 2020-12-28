@@ -49,18 +49,20 @@ export default function Home() {
   return (
 
     <Grid container>
-      <TopBar name={name} levelNo={currentLevel} />
+      <TopBar logout={() => {
+        history.goBack();
+      }} name={name} levelNo={currentLevel} />
 
 
       <Grid container style={{marginTop:'10%'}}>
-     <Typography onClick={() => {
+     {/* <Typography onClick={() => {
         history.goBack()
-      }}>back</Typography>
+      }}>back</Typography> */}
      </Grid>
 
 
-   {currentSet === '' ? <Grid container style={{marginTop: '20vh'}}>
-     <Levels instructorEmail={instructorChosen} setLevel={setLevel} setSet={setSet} />
+   {currentSet === '' ? <Grid container>
+     <Levels setInstructorChosen={setInstructorChosen} instructorEmail={instructorChosen} setLevel={setLevel} setSet={setSet} />
 
 
     </Grid>:<Grid container style={{marginTop: '20vh',alignItems: 'center',justifyContent: 'center'}}>

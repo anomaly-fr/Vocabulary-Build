@@ -90,16 +90,19 @@ const ChooseInstructor : React.FC<Props> = ({setInstructor}) => {
 
 
     <Grid container>
-      <TopBar name={name} levelNo={currentLevel} />
+      <TopBar name={name} levelNo={currentLevel} logout={() => {
+        history.goBack();
+        myConsole.log('Logout choose inst')
+      }} />
 
       <Grid container style={{ marginTop: '10%' }}>
-        <Typography
+        {/* <Typography
           onClick={() => {
             history.goBack();
           }}
         >
           Logout
-        </Typography>
+        </Typography> */}
       </Grid>
 
       {tutors.map((tut,inx) => {

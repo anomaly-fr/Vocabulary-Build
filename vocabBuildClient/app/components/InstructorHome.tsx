@@ -70,20 +70,17 @@ export default function InstructorHome() {
 
   return (
     <Grid container>
-      <TopBar name={name} levelNo={currentLevel} />
+      <TopBar logout={() => {
+        history.goBack();
+        myConsole.log('Logout home')
+      }}
+      name={name}
+      levelNo={currentLevel} />
 
-      <Grid container style={{ marginTop: '10%' }}>
-        <Typography
-          onClick={() => {
-            history.goBack();
-          }}
-        >
-          Logout as instructor
-        </Typography>
-      </Grid>
+
 
       {currentMenuItem === 0 ? (
-        <Grid container style={{ marginTop: '5vh' }}>
+        <Grid container style={{ marginTop: '30vh' }}>
           <Grid
             container
             direction="column"
@@ -132,6 +129,7 @@ export default function InstructorHome() {
           <MyLevels
             level={currentLevel}
             set={currentMenuItem}
+            setCurrentMenuItem={setCurrentMenuItem}
             tutorEmail={location.state.email}
           />
         </Grid>

@@ -28,10 +28,10 @@ const useStyles = makeStyles({
     //  flexDirection: 'column',
     padding: '2%',
     backgroundColor: 'white',
-    //  margin: '5%',
+    margin: '15%',
     borderRadius: 20,
-    alignSelf: 'center',
-    flex: 1,
+
+    marginTop: '5%',
   },
   heading: {
     alignSelf: 'center',
@@ -56,7 +56,7 @@ const useStyles = makeStyles({
   level: {
     borderWidth: 0.5,
     borderColor: 'gray',
-    margin: '1%',
+    margin: '0.5%',
     borderRadius: 10,
     padding: '1%',
   },
@@ -66,9 +66,10 @@ interface Props {
   level: number;
   set: string;
   tutorEmail: string;
+  setCurrentMenuItem : (item : number) => void;
 }
 
-const MyLevels: React.FC<Props> = ({ level, set, tutorEmail }) => {
+const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }) => {
   myConsole.log('My Levels');
 
   const history = useHistory();
@@ -83,13 +84,13 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail }) => {
   const [setSel, setSetSel] = useState<number>(0);
 
   const fetchSets = (levelNo) => {
-    myConsole.log("Fetching sets")
+    myConsole.log('Fetching sets');
     Axios.get(`http://localhost:3000/api/getSetsByLevelNo/${levelNo}`)
       .then((response) => {
         setSets(response.data);
         setLevelSel(levelNo);
 
-        myConsole.log("Sets "+response.data);
+        myConsole.log(`Sets ${response.data}`);
 
         return myConsole.log(sets);
       })
@@ -103,7 +104,7 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail }) => {
       .then((response) => {
         setLevels(response.data);
 
-        myConsole.log("Levels "+response.data);
+        myConsole.log(`Levels ${response.data}`);
         // setLevelSel(response.data.le)
         //   fetchSets();
 
@@ -154,70 +155,92 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail }) => {
   if (levelSel === 0 && setSel === 0)
     return (
       <ThemeProvider theme={theme}>
-        <Grid direction="column" container className={classes.container}>
-          <Grid
-            container
-            direction="row"
-            style={{ alignItems: 'center', justifyContent: 'center' }}
-          >
+        <Grid container>
+          <Grid direction="column" container className={classes.container}>
             <Grid
               container
-              spacing={4}
               direction="row"
-              style={{ alignItems: 'center' }}
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
-              <Grid container style={{ padding: '2%', alignItems: 'center' }}>
-                <AddCircleOutlineIcon
-                  onClick={() => {
-                    showNewLevel(!newLevel);
+              <Grid
+                container
+                spacing={4}
+                direction="row"
+                style={{
+                  alignItems: 'center',
+                  alignSelf: 'center',
+                }}
+              >
+                <Grid item
+                onClick={() => {
+                  setCurrentMenuItem(0);
+                }}
+                >
+                  <ArrowBackIcon />
+                </Grid>
+                <Grid
+                  container
+                  style={{
+                    padding: '2%',
+                    alignItems: 'center',
                   }}
-                />
-                <Typography className={classes.createLevel}>
-                  Create level{' '}
-                </Typography>
-              </Grid>
-              {newLevel ? (
-                <Grid item>
-                  <TextField
-                    value={levelName}
-                    variant="outlined"
-                    placeholder="Level Name"
-                    onChange={(event) => setLevelName(event.target.value)}
+                >
+                  <AddCircleOutlineIcon
+                    onClick={() => {
+                      showNewLevel(!newLevel);
+                    }}
                   />
+
+                  <Typography className={classes.createLevel}>
+                    Create level{' '}
+                  </Typography>
                 </Grid>
-              ) : null}
-              {newLevel ? (
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      if (levelName !== '') createLevel();
-                    }}
-                    color="primary"
-                  >
-                    Create
-                  </Button>
-                </Grid>
-              ) : null}
-            </Grid>
-            <Grid style={{ flex: 1 }}>
-              {levels.map((lev, idx) => {
-                return (
-                  <Grid
-                    onClick={() => {
-                    fetchSets(lev.level_id);
-                    }}
-                    className={classes.level}
-                    style={{ backgroundColor: Theme.palette.primary.dark }}
-                    container
-                    key={idx.toString()}
-                  >
-                    <Typography style={{ color: 'white' }}>
-                      {lev.level_name}
-                    </Typography>
+                {newLevel ? (
+                  <Grid item>
+                    <TextField
+                      value={levelName}
+                      variant="outlined"
+                      placeholder="Level Name"
+                      onChange={(event) => setLevelName(event.target.value)}
+                    />
                   </Grid>
-                );
-              })}
+                ) : null}
+                {newLevel ? (
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        if (levelName !== '') createLevel();
+                      }}
+                      color="primary"
+                    >
+                      Create
+                    </Button>
+                  </Grid>
+                ) : null}
+              </Grid>
+              <Grid style={{ flex: 1, alignSelf: 'center', marginTop: '2%' }}>
+                {levels.map((lev, idx) => {
+                  return (
+                    <Grid
+                      onClick={() => {
+                        fetchSets(lev.level_id);
+                      }}
+                      className={classes.level}
+                      style={{ backgroundColor: Theme.palette.primary.dark }}
+                      container
+                      key={idx.toString()}
+                    >
+                      <Typography style={{ color: 'white' }}>
+                        {lev.level_name}
+                      </Typography>
+                    </Grid>
+                  );
+                })}
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
@@ -230,80 +253,89 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail }) => {
   if (levelSel !== 0 && setSel === 0)
     return (
       <ThemeProvider theme={theme}>
-        <Grid direction="column" container className={classes.container}>
-          <Grid
-            container
-            direction="row"
-            style={{ alignItems: 'center', justifyContent: 'center' }}
-          >
-            <Grid
-              onClick={() => {
-                setLevelSel(0);
-              }}
-              item
-              style={{ padding: '1%' }}
-            >
-              <ArrowBackIcon />
-            </Grid>
-
+        <Grid container style={{ margin: '3%' }}>
+          <Grid direction="column" container className={classes.container}>
             <Grid
               container
-              spacing={4}
               direction="row"
-              style={{ alignItems: 'center' }}
+              style={{ alignItems: 'center', justifyContent: 'center' }}
             >
-              <Grid container style={{ padding: '2%', alignItems: 'center' }}>
-                <AddCircleOutlineIcon
-                  onClick={() => {
-                    showNewSet(!newSet);
-                  }}
-                />
-                <Typography className={classes.createLevel}>
-                  Create Set{' '}
-                </Typography>
+              <Grid
+                onClick={() => {
+                  setLevelSel(0);
+                }}
+                item
+                style={{ flex:1 }}
+              >
+                 <Grid item>
+                 <ArrowBackIcon />
+
+                 </Grid>
               </Grid>
-              {newSet ? (
-                <Grid item>
-                  <TextField
-                    value={setName}
-                    variant="outlined"
-                    placeholder="Set Name"
-                    onChange={(event) => setSetName(event.target.value)}
+
+              <Grid
+                container
+                spacing={4}
+                direction="row"
+                style={{ alignItems: 'center' }}
+              >
+                <Grid container style={{alignItems: 'center',margin: '2%',marginTop:'8%'}}>
+                  <Grid item>
+                  <AddCircleOutlineIcon
+                    onClick={() => {
+                      showNewSet(!newSet);
+                    }}
                   />
-                </Grid>
-              ) : null}
-              {newSet ? (
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      if (setName !== '') createSet();
-                    }}
-                    color="primary"
-                  >
-                    Create
-                  </Button>
-                </Grid>
-              ) : null}
-            </Grid>
-            <Grid style={{ flex: 1 }}>
-              {sets.map((se, idx) => {
-                return (
-                  <Grid
-                    onClick={() => {
-                      setSetSel(se.set_id);
-                    }}
-                    className={classes.level}
-                    style={{ backgroundColor: Theme.palette.primary.dark }}
-                    container
-                    key={idx.toString()}
-                  >
-                    <Typography style={{ color: 'white' }}>
-                      {se.set_name}
-                    </Typography>
                   </Grid>
-                );
-              })}
+
+                  <Typography
+                   className={classes.createLevel}>
+                    Create Set{' '}
+                  </Typography>
+                </Grid>
+                {newSet ? (
+                  <Grid item>
+                    <TextField
+                      value={setName}
+                      variant="outlined"
+                      placeholder="Set Name"
+                      onChange={(event) => setSetName(event.target.value)}
+                    />
+                  </Grid>
+                ) : null}
+                {newSet ? (
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        if (setName !== '') createSet();
+                      }}
+                      color="primary"
+                    >
+                      Create
+                    </Button>
+                  </Grid>
+                ) : null}
+              </Grid>
+              <Grid style={{ flex: 1,marginTop:'2%' }}>
+                {sets.map((se, idx) => {
+                  return (
+                    <Grid
+                      onClick={() => {
+                        setSetSel(se.set_id);
+                      }}
+                      className={classes.level}
+                      style={{ backgroundColor: Theme.palette.primary.dark }}
+                      container
+                      key={idx.toString()}
+                    >
+                      <Typography style={{ color: 'white' }}>
+                        {se.set_name}
+                      </Typography>
+                    </Grid>
+                  );
+                })}
+              </Grid>
             </Grid>
           </Grid>
         </Grid>

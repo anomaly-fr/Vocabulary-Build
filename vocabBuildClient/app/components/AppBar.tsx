@@ -6,12 +6,15 @@ import {
   makeStyles,
   Grid,
   createMuiTheme,
-  InputBase,
+  TextField,
   Typography,
   AppBar,
   Avatar,
   fade,
-  ThemeProvider
+  ThemeProvider,
+  Button,
+  Menu,
+  MenuItem
 } from '@material-ui/core';
 import { myConsole } from '../constants/constants';
 
@@ -76,14 +79,25 @@ const useStyles = makeStyles({
 });
 
 interface Props {
-  name ?: string,
-  levelNo ?: number
+  name ?: string;
+  levelNo ?: number;
+  logout? : () => void;
 
 }
 
 
-const TopBar : React.FC<Props> = ({levelNo,name}) => {
+const TopBar : React.FC<Props> = ({levelNo,name,logout}) => {
  // myConsole.log(JSON.stringify(levelNo))
+ const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    logout();
+    setAnchorEl(null);
+  };
   const classes = useStyles();
   return (
     <ThemeProvider theme={theme}>
@@ -99,17 +113,41 @@ const TopBar : React.FC<Props> = ({levelNo,name}) => {
         }}
       >
         <Grid container justify="center" alignItems="center">
+        <div>
+      {/* <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
+        Open Menu
+      </Button> */}
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem>Profile</MenuItem>
+        <MenuItem>My account</MenuItem>
+        <MenuItem onClick={handleClose}>Logout</MenuItem>
+      </Menu>
+    </div>
           <Grid container direction="row" alignItems="center">
-            <Avatar>{name.substring(0,1).toUpperCase()}</Avatar>
+            <Avatar
+            onClick={handleClick}
+            >{name.substring(0,1).toUpperCase()}</Avatar>
             {/* <Button>A</Button> */}
-           <Typography style={{margin: '2%'}}>{name}</Typography>
+           <Typography style={{margin: '2%',fontWeight: 'bold'}}>{name}</Typography>
           </Grid>
         </Grid>
 
-        <Grid container direction="row" justify="center" alignItems="center">
+        <Grid container style={{flexDirection:'row'}}>
+          <Grid container style={{position:'absolute',alignSelf: 'center',left:1180,flex:1,color:'gray'}}>
           <SearchIcon />
 
-          <InputBase
+          </Grid>
+<Grid container style={{alignSelf:'flex-end'}}>
+<TextField
+style={{padding: '1%'}}
+          variant='outlined'
+          fullWidth
             placeholder="Search for any word"
             classes={
               {
@@ -119,11 +157,14 @@ const TopBar : React.FC<Props> = ({levelNo,name}) => {
             }
             inputProps={{ 'aria-label': 'search' }}
           />
+
+</Grid>
+
         </Grid>
 
-        <Grid container alignItems="center" justify='flex-end'>
+        {/* <Grid container alignItems="center" justify='flex-end'>
           {`Level ${levelNo.levelNo}`}
-        </Grid>
+        </Grid> */}
 
 
 

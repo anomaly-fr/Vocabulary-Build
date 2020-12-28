@@ -51,6 +51,7 @@ const useStyles = makeStyles({
     height: 300,
     flex: 1,
     width: window.innerWidth,
+    paddingBottom: '5%'
   },
   createLevel: {
     fontWeight: 'bold',
@@ -177,7 +178,7 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
 
   const classes = useStyles();
   return(<ThemeProvider theme={theme}>
-    <Grid container style={{padding: '5%',alignItems:'center',justifyContent:'center'}}>
+    <Grid container style={{padding: '10%',alignItems:'center',justifyContent:'center'}}>
     <Grid direction="column" container className={classes.container}>
     <Dialog
         open={open}
@@ -232,21 +233,24 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
           direction="row"
           style={{ alignItems: 'center' }}
         >
-          <Grid container direction='column' style={{ padding: '2%', alignItems: 'center' }}>
+          <Grid container direction='column' style={{ padding: '2%'  }}>
 
-            <Grid container>
+          <Typography style={{flex:1,fontSize:20}} className={classes.createLevel}>
+              {`Number of words: ${words.length}`}
+            </Typography>
+            <Grid container style={{marginTop: '2%'}}>
             <AddCircleOutlineIcon
               onClick={() => {
                 showNewWord(!newWord);
               }}
             />
+
              <Typography className={classes.createLevel}>
               Add Word{' '}
             </Typography>
+
             </Grid>
-            <Typography className={classes.createLevel}>
-              {`Number of words: ${words.length}`}
-            </Typography>
+
 
 
 
@@ -255,8 +259,9 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
             <Grid item>
 
               <TextField
-              style={{margin: '1%'}}
+        //      style={{margin: '1%'}}
                 value={wordTitle}
+                size='small'
                 variant="outlined"
                 placeholder="Word Title"
                 onChange={(event) => setWordTitle(event.target.value)}
@@ -264,7 +269,7 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
               <Grid container spacing={1} style={{width: window.innerWidth,padding: '0.5%'}}>
               <TextField
               size='small'
-              style={{margin : '1%'}}
+             // style={{margin : '1%'}}
                 value={wordCorrectDef}
                 variant="outlined"
                 placeholder="Correct Definition"
@@ -272,7 +277,7 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
               />
                <TextField
               size='small'
-              style={{margin : '1%'}}
+             // style={{margin : '1%'}}
 
                 value={wordIncorrect1}
                 variant="outlined"
@@ -281,7 +286,7 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
               />
                <TextField
               size='small'
-              style={{margin : '1%'}}
+           //   style={{margin : '1%'}}
 
                 value={wordIncorrect2}
                 variant="outlined"
@@ -290,7 +295,7 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
               />
                <TextField
               size='small'
-              style={{margin : '1%'}}
+         //     style={{margin : '1%'}}
 
                 value={wordIncorrect3}
                 variant="outlined"
@@ -304,9 +309,9 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
 
         </Grid>
         {newWord ? (
-            <Grid item style={{marginTop: '4%'}}>
+            <Grid container style={{marginTop: '4%'}}>
               <Button
-              fullWidth
+
                 variant="contained"
                 onClick={() => {
                   if (wordTitle !== '' && wordCorrectDef !== ''

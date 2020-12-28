@@ -12,6 +12,7 @@ import ContactSupportIcon from '@material-ui/icons/ContactSupport';
 import { Link } from 'react-router-dom';
 import { Theme } from '../constants/theme';
 import AudioCard from './AudioCard';
+import { myConsole } from '../constants/constants';
 
 interface Props {
   round: number;
@@ -54,7 +55,10 @@ const Instructions: React.FC<Props> = ({ round, setCurrentRound }) => {
         ) : null}
         <Button
           onClick={() => {
-            setCurrentRound(1);
+            if (round === 1) {
+              myConsole.log('Press');
+              setCurrentRound(1);
+            } else if (round === 2) setCurrentRound(2);
           }}
           type="submit"
           variant="contained"

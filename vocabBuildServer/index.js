@@ -140,10 +140,10 @@ app.get("/api/getLevelsByTutor/:tutor_email",(req,res) => {
 
 
 
-// Get Sets
+// Get Sets and number of words in each set
 app.get("/api/getSetsByLevelNo/:level_id",(req,res) => {
     console.log("body "+req.body);
-    const sqlSelect = "SELECT * FROM level_set WHERE level_id=?;";
+    const sqlSelect = "SELECT ls.set_id,set_name,level_id,w.set_id,COUNT(w.set_id) AS number_of_words FROM level_set ls JOIN word w ON (ls.set_id=w.set_id) WHERE level_id=? GROUP BY w.set_id;";
     const levelNo = req.params.level_id;
     db.query(sqlSelect,[levelNo],(error,result) => {
         console.log("Result " +result);
@@ -235,6 +235,28 @@ app.get("/api/getNumberOfWordsByTutorEmail",(req,res) => {
     });
 
 });
+
+
+
+// Get words by set_id
+app.get("/api/getWordsBySetId/:set_id",(req,res) => {
+    const sqlSelect = "SELECT * FROM word where set_id=?";
+    const set_id = req.params.set_id;
+    db.query(sqlSelect,[set_id],(error,result) => {
+        console.log("Result " +result);
+        console.log("Error "+error);
+        
+         res.json(result);
+
+    });
+
+});
+
+
+
+
+
+
 
 
 app.listen(3000, () => {

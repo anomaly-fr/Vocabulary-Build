@@ -14,20 +14,20 @@ import {
 import { useSpring, animated } from 'react-spring';
 import { Link } from 'react-router-dom';
 import HearingIcon from '@material-ui/icons/Hearing';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import MenuBookIcon from '@material-ui/icons/MenuBook';
 import { myConsole } from '../constants/constants';
 import { Theme } from '../constants/theme';
 import Instructions from './Instructions';
 import AudioCard from './AudioCard';
+import Quiz from './Quiz';
 
 const theme = Theme;
 
 interface Props {
-  levelNo : number,
-  setNo : string,
-  setSet: (set: string) => void;
-  setRound: (round: number) => void;
+ setFinalSet : (set : number) => void;
+ finalSet : number;
 }
 
 const AnimatedGrid = animated(Grid);
@@ -72,7 +72,7 @@ const useStyles = makeStyles({
   }
 });
 
-const Rounds: React.FC<Props> = ({ setRound, setSet ,levelNo,setNo }) => {
+const Rounds: React.FC<Props> = ({ setFinalSet,finalSet }) => {
 
   const [hover1, is1hovered] = useState<boolean>(false);
   const [hover2, is2hovered] = useState<boolean>(false);
@@ -85,16 +85,14 @@ const Rounds: React.FC<Props> = ({ setRound, setSet ,levelNo,setNo }) => {
     setCurrentRound(r);
   }
 
-  myConsole.log(`Shows ${levelNo} ${setNo}`)
+  // myConsole.log(`Shows ${levelNo} ${setNo}`)
   const classes = useStyles();
   if(currentRound === 0)
   return (
     <ThemeProvider theme={theme}>
       <Grid container className={classes.container}>
         <Grid container style={{ margin: '1%' }}>
-          <Typography onClick={() => setSet('')} style={{ color: 'white' }}>
-            Back
-          </Typography>
+          <ArrowBackIcon onClick={() => setFinalSet(0)} />
         </Grid>
 
         <Grid container className={classes.cardAlign}>
@@ -171,7 +169,10 @@ const Rounds: React.FC<Props> = ({ setRound, setSet ,levelNo,setNo }) => {
     </ThemeProvider>
   )
 
+  if(currentRound === 1)
   return(<AudioCard setCurrentRound={setCurrentRoundFunction} />)
+
+  return(<Quiz setCurrentRound={setCurrentRound} setId={finalSet} />)
 };
 
 export default Rounds;

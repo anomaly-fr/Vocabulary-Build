@@ -1,4 +1,4 @@
-/* eslint-disable no-lone-blocks */
+/* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
 
 import {
@@ -12,15 +12,16 @@ import {
 } from '@material-ui/core';
 
 import { useSpring, animated } from 'react-spring';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import Axios from 'axios';
 import { myConsole } from '../constants/constants';
 import { Theme } from '../constants/theme';
-
-import Axios from 'axios';
-import { levels } from 'electron-log';
+import Quiz from './Quiz';
+import Rounds from './Rounds';
 
 const levelDimensions = {
-  width: window.innerWidth / 6,
-  height: window.innerHeight / 3,
+  width: window.innerWidth / 10,
+  height: window.innerHeight / 5,
 };
 
 const theme = Theme;
@@ -39,8 +40,8 @@ const useStyles = makeStyles({
   },
   text: {
     color: theme.palette.secondary.main,
-    fontWeight: 'bold',
-    fontSize: 20,
+    //   fontWeight: 'bold',
+    fontSize: 18,
     marginTop: 10,
     //   alignSelf: 'center'
   },
@@ -68,7 +69,14 @@ const useStyles = makeStyles({
     justifyContent: 'center',
     textAlign: 'center',
     backgroundColor: 'white',
+    //  margin: '1%',
+  },
+  oneSet: {
+    borderRadius: 10,
+    padding: '2%',
     margin: '1%',
+    backgroundColor: theme.palette.primary.light,
+    color: 'white',
   },
 });
 
@@ -76,20 +84,25 @@ interface Props {
   setLevel: (level: number) => void;
   setSet: (set: string) => void;
   instructorEmail: string;
+  setInstructorChosen: (ins: number) => void;
 }
-const Levels: React.FC<Props> = ({ setLevel, setSet, instructorEmail }) => {
+
+const Levels: React.FC<Props> = ({
+  setLevel,
+  setSet,
+  instructorEmail,
+  setInstructorChosen,
+}) => {
   const [level, selLevel] = useState<number>(0);
   const [levelsFetched, setLevelsFetched] = useState([]);
+  const [finalSet,setFinalSet] = useState<number>(0);
   const [randomData, setRandomData] = useState(0);
-  const [sets,setSets] = useState([]);
 
-
-
-  const [hover1, isHovered1] = useState<boolean>(false);
-
-  // For sets
+  const [sets, setSets] = useState([]);
+  const AnimatedGrid = animated(Grid);
+  const AnimatedText = animated(Typography);
+  const AnimatedCard = animated(Card);
   const [cardHovered, setCardHovered] = useState<number>(0);
-
   const card1AnimationProps = useSpring({
     transform: cardHovered === 1 ? 'scale(1.15)' : 'scale(1)',
   });
@@ -99,8 +112,15 @@ const Levels: React.FC<Props> = ({ setLevel, setSet, instructorEmail }) => {
   const card3AnimationProps = useSpring({
     transform: cardHovered === 3 ? 'scale(1.15)' : 'scale(1)',
   });
+  const hoverEffect = (set: string) => {
+    if (set === 'Set 1') setCardHovered(1);
+    else if (set === 'Set 2') setCardHovered(2);
+    else if (set === 'Set 3') setCardHovered(3);
+  };
 
-  //  const [level,setLevel] = useState<number>(0)
+  const restore = (set: string) => {
+    setCardHovered(0);
+  };
 
   const getLevels = () => {
     myConsole.log('Fetching levels');
@@ -122,20 +142,20 @@ const Levels: React.FC<Props> = ({ setLevel, setSet, instructorEmail }) => {
       });
   };
 
-  const getSets = (levelNo) => {
+  const getSets = (levelNo: number) => {
     myConsole.log('Fetching Sets');
     Axios.get(`http://localhost:3000/api/getSetsByLevelNo/${levelNo}`)
       .then((response) => {
         const arr = response.data;
-        let i;
-        for (i in arr) {
-          arr[i] = {
-            ...arr[i],
-            id: false,
-          };
-        }
+        // let i;
+        // for (i in arr) {
+        //   arr[i] = {
+        //     ...arr[i],
+        //     id: false,
+        //   };
+        // }
         setSets(arr);
-        return myConsole.log(`Sets ${response.data}`);
+        return myConsole.log(`Sets ${JSON.stringify(response.data)}`);
       })
       .catch((e) => {
         myConsole.log(e);
@@ -146,117 +166,155 @@ const Levels: React.FC<Props> = ({ setLevel, setSet, instructorEmail }) => {
     getLevels();
   }, [instructorEmail]);
 
-  const classes = useStyles();
-
-  const AnimatedGrid = animated(Grid);
-  const AnimatedText = animated(Typography);
-  const AnimatedCard = animated(Card);
-
-
-  const hoverEffect = (set: string) => {
-    if (set === 'Set 1') setCardHovered(1);
-    else if (set === 'Set 2') setCardHovered(2);
-    else if (set === 'Set 3') setCardHovered(3);
-  };
-
-  const restore = (set: string) => {
-    setCardHovered(0);
-    //   if(set === 'Set 1'){
-    //     isCard1Hovered(false)
-
-    //   }
-    //   else if(set === 'Set 2')
-    //   isCard2Hovered(false)
-    //   else isCard3Hovered(false)
-  };
-
   const resolveSets = (set: string) => {
     if (set === 'Set 1') return card1AnimationProps;
     if (set === 'Set 2') return card2AnimationProps;
     return card3AnimationProps;
   };
 
-  const renderSets = () => {
-    return sets.map((set) => {
+  const renderCards = (lev) => {
+    const cards = [
+      {
+        card_name: 'View Sets',
+      },
+      {
+        card_name: 'Leader Board',
+      },
+    ];
+    return cards.map((set) => {
       return (
         <Grid
           direction="row"
           className={classes.set}
-          key={set.set_name.toString()}
+          key={set.card_name.toString()}
           container
         >
           <AnimatedCard
-            onMouseEnter={() => hoverEffect(set.toString())}
-            onMouseLeave={() => restore(set.toString())}
-            style={resolveSets(set.toString())}
+            onMouseEnter={() => hoverEffect(set.card_name.toString())} // Here lies the issue
+            onMouseLeave={() => restore(set.card_name.toString())}
+            style={resolveSets(set.card_name.toString())}
             className={classes.card}
             onClick={() => {
-              // setSet(set);
+              if (set.card_name === 'View Sets') {
+                getSets(lev.level_id);
+                setRandomData(Math.random());
+              } else myConsole.log('Closer');
             }}
           >
-            <Typography style={{ color: theme.palette.primary.light }}>
-              {set.set_name}
+            <Typography
+              style={{ color: theme.palette.primary.light, fontSize: 14 }}
+            >
+              {set.card_name}
             </Typography>
           </AnimatedCard>
         </Grid>
       );
     });
   };
-  // myConsole.log('Hello World!');
 
+  const classes = useStyles();
+
+  if (!finalSet)
   return (
     <ThemeProvider theme={theme}>
-      <Grid
-        container // Main
-        alignItems="center"
-        justify="space-around"
-        direction="row"
-        spacing={10}
-      >
-        {levelsFetched.map((lev, inx) => (
-          <Box
-            key={inx.toString()}
-            border={6}
-            borderRadius={26}
-            borderColor={lev.id ? theme.palette.primary.dark : 'transparent'}
-          >
+      <Grid container style={{ flex: 1, alignSelf: 'flex-start' }}>
+        <ArrowBackIcon
+          onClick={() => {
+            setInstructorChosen(0);
+          }}
+          style={{ margin: '2%' }}
+        />
+        <Grid
+          container
+          direction="column"
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Typography style={{ fontSize: 20 }}>Levels: </Typography>
+        </Grid>
+
+        <Grid container>
+          {levelsFetched.map((lev, inx) => (
+            <Box
+              key={inx.toString()}
+              border={6}
+              borderRadius={26}
+              borderColor={lev.id ? theme.palette.primary.dark : 'transparent'}
+            >
+              <Grid
+                container
+                onClick={() => {
+                  for (const i in levelsFetched) {
+                    levelsFetched[i].id = false;
+                  }
+                  lev.id = !lev.id;
+                  //   getSets(lev.level_no);
+                  setRandomData(Math.random());
+                }}
+                className={classes.level}
+              >
+                <Typography
+                  style={{ marginTop: lev.id ? 5 : 80 }}
+                  className={classes.text}
+                >
+                  {lev.level_name}
+                </Typography>
+                <Grid
+                  style={{ opacity: lev.id ? 1 : 0 }}
+                  className={classes.set}
+                  container
+                >
+                  {renderCards(lev)}
+                  {/* <Grid container>
+                  <Typography>
+
+                  </Typography>
+
+                </Grid> */}
+                </Grid>
+              </Grid>
+            </Box>
+          ))}
+
+          <Grid container>
             <Grid
               container
-              onMouseEnter={() => isHovered1(true)}
-              onMouseLeave={() => isHovered1(false)}
-              onClick={() => {
-
-                for(let i in levelsFetched){
-                   levelsFetched[i].id = false;
-                }
-                lev.id = !lev.id;
-                getSets(lev.level_no);
-                setRandomData(Math.random());
-                // setLevel(1);
-                // selLevel(1);
-                // myConsole.log('I work')
+              direction="column"
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
-              className={classes.level}
             >
-              <AnimatedText
-                style={{ marginTop: lev.id ? 10 : 100 }}
-                className={classes.text}
-              >
-                {lev.level_name}
-              </AnimatedText>
-              <AnimatedGrid
-                style={{ opacity: lev.id ? 1 : 0 }}
-                className={classes.set}
-                container
-              >
-                <Grid container>{renderSets()}</Grid>
-              </AnimatedGrid>
+              <Typography style={{ fontSize: 20 }}>Sets: </Typography>
             </Grid>
-          </Box>
-        ))}
+            {sets.map((set, inx) => {
+              return (
+                <Grid
+                  justify="space-between"
+                  className={classes.oneSet}
+                  onClick={() => {
+                    myConsole.log('Quiz');
+                  //  goToPlay(set.set_id);
+                     setFinalSet(set.set_id);
+
+                  }}
+                  key={inx.toString()}
+                  container
+                >
+                  <Typography>{`${set.set_name}`}</Typography>
+                  <Typography>{`Number of words: ${set.number_of_words}`}</Typography>
+                </Grid>
+              );
+            })}
+          </Grid>
+        </Grid>
       </Grid>
     </ThemeProvider>
   );
+  return <Rounds setFinalSet={setFinalSet} finalSet={finalSet} />
+
 };
+
+
 
 export default Levels;
