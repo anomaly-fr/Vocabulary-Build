@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   makeStyles,
@@ -22,12 +22,16 @@ import { Theme } from '../constants/theme';
 import Instructions from './Instructions';
 import AudioCard from './AudioCard';
 import Quiz from './Quiz';
+import Axios from 'axios';
+import currentEmail from '../constants/constants';
 
 const theme = Theme;
 
 interface Props {
  setFinalSet : (set : number) => void;
  finalSet : number;
+ instructorEmail : string;
+ userEmail  :string;
 }
 
 const AnimatedGrid = animated(Grid);
@@ -72,11 +76,14 @@ const useStyles = makeStyles({
   }
 });
 
-const Rounds: React.FC<Props> = ({ setFinalSet,finalSet }) => {
+const Rounds: React.FC<Props> = ({ setFinalSet,finalSet,instructorEmail,userEmail }) => {
 
   const [hover1, is1hovered] = useState<boolean>(false);
   const [hover2, is2hovered] = useState<boolean>(false);
   const [hover3, is3hovered] = useState<boolean>(false);
+
+  const [bestScore,setBestScore] = useState<number>();
+  const [readyToGo,setReadyGo] = useState<boolean>(false);
 
   const [round, selRound] = useState<number>(0);
   const [currentRound,setCurrentRound] = useState<number>(0);
@@ -84,6 +91,11 @@ const Rounds: React.FC<Props> = ({ setFinalSet,finalSet }) => {
   const setCurrentRoundFunction = (r: number) => {
     setCurrentRound(r);
   }
+
+  // useEffect(() => {
+
+
+  // },[])
 
   // myConsole.log(`Shows ${levelNo} ${setNo}`)
   const classes = useStyles();
@@ -103,8 +115,11 @@ const Rounds: React.FC<Props> = ({ setFinalSet,finalSet }) => {
             <Card
               className={classes.card}
               onClick={() => {
-                myConsole.log('sound');
-                selRound(1);
+
+                  myConsole.log('sound');
+                  selRound(1);
+
+
               }}
               // style={{flex:1,     height : window.innerHeight/3,
               // }}
@@ -136,6 +151,7 @@ const Rounds: React.FC<Props> = ({ setFinalSet,finalSet }) => {
             <Card
               className={classes.card}
               onClick={() => {
+
                 myConsole.log('eh')
                 selRound(2)
               }}
@@ -170,9 +186,9 @@ const Rounds: React.FC<Props> = ({ setFinalSet,finalSet }) => {
   )
 
   if(currentRound === 1)
-  return(<AudioCard setCurrentRound={setCurrentRoundFunction} />)
+  return(<AudioCard setId={finalSet} setCurrentRound={setCurrentRoundFunction} />)
 
-  return(<Quiz setCurrentRound={setCurrentRound} setId={finalSet} />)
+  return(<Quiz userEmail={userEmail} setCurrentRound={setCurrentRound} setId={finalSet} />)
 };
 
 export default Rounds;

@@ -9,15 +9,21 @@ import {
   ThemeProvider,
   Box,
   Card,
+  Button,
 } from '@material-ui/core';
 
 import { useSpring, animated } from 'react-spring';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Axios from 'axios';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Rounds from './Rounds';
+import Quiz from './Quiz';
 import { myConsole } from '../constants/constants';
 import { Theme } from '../constants/theme';
-import Quiz from './Quiz';
-import Rounds from './Rounds';
 
 const levelDimensions = {
   width: window.innerWidth / 10,
@@ -97,11 +103,14 @@ const Levels: React.FC<Props> = ({
   const [levelsFetched, setLevelsFetched] = useState([]);
   const [finalSet,setFinalSet] = useState<number>(0);
   const [randomData, setRandomData] = useState(0);
-
+  const [open,setOpen] = useState<boolean>(false);
+  const [openBoard,setOpenBoard] = useState<boolean>(false);
   const [sets, setSets] = useState([]);
   const AnimatedGrid = animated(Grid);
   const AnimatedText = animated(Typography);
   const AnimatedCard = animated(Card);
+  const [setStats,setSetStats] = useState({"stats":[{"highest_quiz_score":-1,"highest_audio_score":-1,"average_quiz_score":-1,"average_audio_score":-1,"email":"Loading"}],"topper":[{"email":"Loading","best_score_audio":-1,"best_score_quiz":-1,"total":-1,"name":"Loading"}]});
+  const [board,setBoard] = useState([{"email":"","level_total":-1,"name":""}]);
   const [cardHovered, setCardHovered] = useState<number>(0);
   const card1AnimationProps = useSpring({
     transform: cardHovered === 1 ? 'scale(1.15)' : 'scale(1)',
@@ -122,6 +131,25 @@ const Levels: React.FC<Props> = ({
     setCardHovered(0);
   };
 
+  const handleShowDialog = () => {
+
+    setOpen(true);
+  }
+
+  const handleHideDialog = () => {
+ //   setCurrentRound(0)
+    setOpen(false);
+  }
+  const handleShowBoardDialog = () => {
+
+    setOpenBoard(true);
+  }
+
+  const handleHideBoardDialog = () => {
+ //   setCurrentRound(0)
+    setOpenBoard(false);
+  }
+
   const getLevels = () => {
     myConsole.log('Fetching levels');
     Axios.get(`http://localhost:3000/api/getLevelsByTutor/${instructorEmail}`)
@@ -140,6 +168,36 @@ const Levels: React.FC<Props> = ({
       .catch((e) => {
         myConsole.log(e);
       });
+  };
+
+  const getStats = (setId:number) => {
+    Axios.get(`http://localhost:3000/api/getSetStats/${setId}`)
+      .then((response) => {
+        handleShowDialog();
+
+        setSetStats(response.data);
+        return myConsole.log(`Sets stats ${JSON.stringify(response.data)}`);
+      })
+      .catch((e) => {
+        myConsole.log(e);
+      });
+
+
+
+  };
+  const getLeaderBoard = (levelId:number) => {
+    Axios.get(`http://localhost:3000/api/getLevelLeaderboard/${levelId}`)
+      .then((response) => {
+        handleShowBoardDialog();
+        setBoard(response.data);
+        return myConsole.log(`Level leaderboard ${JSON.stringify(response.data)}`);
+      })
+      .catch((e) => {
+        myConsole.log(e);
+      });
+
+
+
   };
 
   const getSets = (levelNo: number) => {
@@ -172,6 +230,7 @@ const Levels: React.FC<Props> = ({
     return card3AnimationProps;
   };
 
+
   const renderCards = (lev) => {
     const cards = [
       {
@@ -198,7 +257,9 @@ const Levels: React.FC<Props> = ({
               if (set.card_name === 'View Sets') {
                 getSets(lev.level_id);
                 setRandomData(Math.random());
-              } else myConsole.log('Closer');
+              } else {
+                getLeaderBoard(lev.level_id);
+              }
             }}
           >
             <Typography
@@ -217,6 +278,101 @@ const Levels: React.FC<Props> = ({
   if (!finalSet)
   return (
     <ThemeProvider theme={theme}>
+      <Dialog
+        open={open}
+   //     TransitionComponent={Transition}
+        keepMounted
+        onClose={handleHideDialog}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">Set Statistics</DialogTitle>
+        <DialogContent style={{backgroundColor: theme.palette.primary.dark,borderRadius:20,margin:'2%'}}>
+
+
+         <Grid container justify='space-between'>
+         <DialogContentText style={{color:'white',fontSize:14}}>
+         Highest Audio Round Score:
+          </DialogContentText>
+          <DialogContentText style={{color:'white',fontSize:14}}>
+         {setStats.stats[0].highest_audio_score}
+          </DialogContentText>
+         </Grid>
+         <Grid container justify='space-between'>
+         <DialogContentText style={{color:'white',fontSize:14}}>
+         Highest Quiz Round Score:
+          </DialogContentText>
+          <DialogContentText style={{color:'white',fontSize:14}}>
+         {setStats.stats[0].highest_quiz_score}
+          </DialogContentText>
+         </Grid>
+         <Grid container justify='space-between'>
+         <DialogContentText style={{color:'white',fontSize:14}}>
+         Average Audio Round Score:
+          </DialogContentText>
+          <DialogContentText style={{color:'white',fontSize:14}}>
+         {setStats.stats[0].average_audio_score}
+          </DialogContentText>
+          <Grid container justify='space-between'>
+         <DialogContentText style={{color:'white',fontSize:14}}>
+         Average Audio Round Score:
+          </DialogContentText>
+          <DialogContentText style={{color:'white',fontSize:14}}>
+         {setStats.stats[0].average_quiz_score}
+          </DialogContentText>
+         </Grid>
+         <Grid container justify='space-between'>
+         <DialogContentText style={{color:'white',fontSize:14}}>
+         Set Top Scorer Name
+          </DialogContentText>
+          <DialogContentText style={{color:'white',fontSize:14}}>
+         {setStats.topper[0].name}
+          </DialogContentText>
+         </Grid>
+         <Grid container justify='space-between'>
+         <DialogContentText style={{color:'white',fontSize:14}}>
+         Toper's total
+          </DialogContentText>
+          <DialogContentText style={{color:'white',fontSize:14}}>
+         {setStats.topper[0].total}
+          </DialogContentText>
+         </Grid>
+         </Grid>
+        </DialogContent>
+
+      </Dialog>
+
+      {/* for leaderboard */}
+
+      <Dialog
+        open={openBoard}
+   //     TransitionComponent={Transition}
+        keepMounted
+        onClose={handleHideBoardDialog}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">Leaderboard</DialogTitle>
+        <DialogContent style={{backgroundColor: theme.palette.primary.dark,borderRadius:20,margin:'2%'}}>
+      {board.map((row,inx) => {
+        return(<Grid style={{backgroundColor:theme.palette.primary.dark,margin:'2%'}} container justify='space-between' key={inx.toString()}>
+          <Grid item  style={{backgroundColor: theme.palette.primary.light,margin: '1%',borderRadius:10,flex:1}}>
+          <DialogContentText style={{color:'white',fontSize:12}}>
+{`${(inx+1).toString()}. ${row.name}`}
+        </DialogContentText>
+
+        <DialogContentText style={{color:'white',fontSize:12}}>
+{`${row.level_total}`}
+        </DialogContentText>
+
+          </Grid>
+
+        </Grid>
+        )
+      })}
+        </DialogContent>
+
+      </Dialog>
       <Grid container style={{ flex: 1, alignSelf: 'flex-start' }}>
         <ArrowBackIcon
           onClick={() => {
@@ -295,13 +451,22 @@ const Levels: React.FC<Props> = ({
                   onClick={() => {
                     myConsole.log('Quiz');
                   //  goToPlay(set.set_id);
-                     setFinalSet(set.set_id);
+                  //   setFinalSet(set.set_id);
 
                   }}
                   key={inx.toString()}
                   container
                 >
                   <Typography>{`${set.set_name}`}</Typography>
+                  <Button
+                  onClick={() => {
+                    getStats(set.set_id);
+
+                  }}
+                  variant='outlined'
+                  >
+                    View Stats
+                  </Button>
                   <Typography>{`Number of words: ${set.number_of_words}`}</Typography>
                 </Grid>
               );
@@ -311,7 +476,7 @@ const Levels: React.FC<Props> = ({
       </Grid>
     </ThemeProvider>
   );
-  return <Rounds setFinalSet={setFinalSet} finalSet={finalSet} />
+  return <Rounds instructorEmail={instructorEmail} setFinalSet={setFinalSet} finalSet={finalSet} />
 
 };
 

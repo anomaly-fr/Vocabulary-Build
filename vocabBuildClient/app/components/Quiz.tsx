@@ -21,6 +21,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { Theme } from '../constants/theme';
 
 import { myConsole } from '../constants/constants';
+import TopBar from './AppBar';
 
 const theme = Theme;
 const useStyles = makeStyles({
@@ -62,16 +63,21 @@ const useStyles = makeStyles({
 interface Props {
   setId: number;
   setCurrentRound : (round : number) => void;
-  bestScore : any;
+  userEmail : string;
 }
 
-const Quiz: React.FC<Props> = ({ setId,setCurrentRound,bestScore }) => {
+const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
+  myConsole.log(`Email is ${userEmail}`)
   const [quiz, setQuiz] = useState([]);
   const [oneEnter, setOneEnter] = useState<boolean>(false);
   const [quizLoaded, setQuizLoaded] = useState<boolean>(false);
   const [questionNumber, setQuestionNumber] = useState<number>(0);
   const [answered, setAnswered] = useState<boolean>(false);
   const [open,setOpen] = useState<boolean>(false);
+  const [bestScore,setBestScore] = useState<number>(0);
+  const [open,setOpen] = useState<boolean>(false);
+
+
   const [colours, setColours] = useState([
     'transparent',
     'transparent',
@@ -134,13 +140,36 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,bestScore }) => {
     setOpen(false);
   }
 
+  const updateScore = () => {
+    Axios.post(`http://localhost:3000/api/updateBestScore/quiz`,{
+
+
+      email: window.localStorage.getItem('email'),
+      set_id : setId,
+      best_score_quiz : score
+
+
+    })
+    .then((response) => {
+      myConsole.log("result "+JSON.stringify(response.data));
+      setBestScore(response.data[0].best_score_quiz);
+      handleShowDialog();
+
+      return myConsole.log(JSON.stringify(response.data));
+    })
+    .catch((e) => {
+      myConsole.log(e);
+    });
+
+  }
+
   const nextQuestion = () => {
     setAnswered(false);
     if (questionNumber + 1 !== quiz.length) {
       setColours(['transparent', 'transparent', 'transparent', 'transparent']);
       setQuestionNumber(questionNumber + 1);
     } else {
-      handleShowDialog();
+       updateScore();
     }
   };
   const classes = useStyles();
@@ -166,7 +195,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,bestScore }) => {
         <DialogTitle id="alert-dialog-slide-title">{"Quiz Completed!"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-  {`You scored ${score}/${quiz.length}! Your best score for this set is ${9}`}
+  {`You scored ${score}/${quiz.length}! Your best score for this set is ${bestScore}`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

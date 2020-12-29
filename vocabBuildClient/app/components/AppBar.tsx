@@ -82,11 +82,12 @@ interface Props {
   name ?: string;
   levelNo ?: number;
   logout? : () => void;
+  email? : string;
 
 }
 
 
-const TopBar : React.FC<Props> = ({levelNo,name,logout}) => {
+const TopBar : React.FC<Props> = ({levelNo,name,logout,email}) => {
  // myConsole.log(JSON.stringify(levelNo))
  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -99,6 +100,7 @@ const TopBar : React.FC<Props> = ({levelNo,name,logout}) => {
     setAnchorEl(null);
   };
   const classes = useStyles();
+
   return (
     <ThemeProvider theme={theme}>
       <AppBar
