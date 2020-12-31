@@ -355,13 +355,13 @@ const Levels: React.FC<Props> = ({
         <DialogTitle id="alert-dialog-slide-title">Leaderboard</DialogTitle>
         <DialogContent style={{backgroundColor: theme.palette.primary.dark,borderRadius:20,margin:'2%'}}>
       {board.map((row,inx) => {
-        return(<Grid style={{backgroundColor:theme.palette.primary.dark,margin:'2%'}} container justify='space-between' key={inx.toString()}>
-          <Grid item  style={{backgroundColor: theme.palette.primary.light,margin: '1%',borderRadius:10,flex:1}}>
-          <DialogContentText style={{color:'white',fontSize:12}}>
+        return(<Grid style={{backgroundColor:theme.palette.primary.dark,margin:'1%'}} container justify='space-between' key={inx.toString()}>
+          <Grid container justify='space-between' direction='row' style={{backgroundColor: theme.palette.primary.light,margin: '1%',padding:'1%',alignItems:'center',borderRadius:5,flex:1,width:300}}>
+          <DialogContentText style={{color:'white',fontSize:16,alignSelf:'center'}}>
 {`${(inx+1).toString()}. ${row.name}`}
         </DialogContentText>
 
-        <DialogContentText style={{color:'white',fontSize:12}}>
+        <DialogContentText style={{color:'white',fontSize:16,alignSelf: 'center'}}>
 {`${row.level_total}`}
         </DialogContentText>
 
@@ -385,7 +385,7 @@ const Levels: React.FC<Props> = ({
           direction="column"
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
-          <Typography style={{ fontSize: 20 }}>Levels: </Typography>
+          <Typography style={{ fontSize: 20,color:'white',fontWeight:'bold' }}>Levels </Typography>
         </Grid>
 
         <Grid container>
@@ -441,33 +441,42 @@ const Levels: React.FC<Props> = ({
                 alignItems: 'center',
               }}
             >
-              <Typography style={{ fontSize: 20 }}>Sets: </Typography>
+              <Typography style={{ fontSize: 20,color:'white',fontWeight:'bold',marginTop:'3%'} }>Sets </Typography>
             </Grid>
             {sets.map((set, inx) => {
               return (
+                <Grid direction='row' style={{backgroundColor:theme.palette.primary.dark,borderRadius:10,margin:'1%'}} container key={inx.toString()}
+                >
                 <Grid
                   justify="space-between"
+                  style={{flex:7}}
                   className={classes.oneSet}
                   onClick={() => {
                     myConsole.log('Quiz');
                   //  goToPlay(set.set_id);
-                  //   setFinalSet(set.set_id);
+                     setFinalSet(set.set_id);
 
                   }}
-                  key={inx.toString()}
                   container
                 >
                   <Typography>{`${set.set_name}`}</Typography>
-                  <Button
+
+                  <Typography>{`Number of words: ${set.number_of_words}`}</Typography>
+                </Grid>
+                <Grid container style={{flex:1,alignItems: 'center',justifyContent: 'flex-end',margin:'1%'}}>
+                <Button
+
                   onClick={() => {
                     getStats(set.set_id);
 
                   }}
-                  variant='outlined'
+                  variant='contained'
+                  style= {{backgroundColor: theme.palette.primary.light,color:'white',alignItems:'center'}}
                   >
                     View Stats
                   </Button>
-                  <Typography>{`Number of words: ${set.number_of_words}`}</Typography>
+                  </Grid>
+
                 </Grid>
               );
             })}

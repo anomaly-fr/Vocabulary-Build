@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
+import React, { useEffect,useState } from 'react';
 import { purple } from '@material-ui/core/colors';
 import SearchIcon from '@material-ui/icons/Search';
 import {
@@ -17,6 +17,8 @@ import {
   MenuItem
 } from '@material-ui/core';
 import { myConsole } from '../constants/constants';
+import Axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
 
 const theme = createMuiTheme({
@@ -83,13 +85,15 @@ interface Props {
   levelNo ?: number;
   logout? : () => void;
   email? : string;
+  leaderboard? : (b:boolean) => void
 
 }
 
 
-const TopBar : React.FC<Props> = ({levelNo,name,logout,email}) => {
+const TopBar : React.FC<Props> = ({ name,logout,leaderboard }) => {
  // myConsole.log(JSON.stringify(levelNo))
  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+ const history = useHistory();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -99,6 +103,11 @@ const TopBar : React.FC<Props> = ({levelNo,name,logout,email}) => {
     logout();
     setAnchorEl(null);
   };
+
+  const [hover,setHover] = useState<boolean>(false);
+
+
+
   const classes = useStyles();
 
   return (
@@ -164,9 +173,17 @@ style={{padding: '1%'}}
 
         </Grid>
 
-        {/* <Grid container alignItems="center" justify='flex-end'>
-          {`Level ${levelNo.levelNo}`}
-        </Grid> */}
+        <Grid
+        onClick={() => {
+          myConsole.log('lb')
+          leaderboard();
+
+
+        }}
+        onMouseEnter={() => setHover(true) }
+         container style={{fontWeight: 'bold',cursor: 'pointer'}} alignItems="center" justify='flex-end'>
+          {`Leaderboard`}
+        </Grid>
 
 
 

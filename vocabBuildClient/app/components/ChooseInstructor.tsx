@@ -10,6 +10,7 @@ import { myConsole } from '../constants/constants';
 import MyLevels from './MyLevels';
 import { Theme } from '../constants/theme';
 import Axios from 'axios';
+import LeaderBoard from '../containers/LeaderBoard';
 
 interface Props{
   setInstructor : (instructor : string) => void;
@@ -120,6 +121,11 @@ const ChooseInstructor : React.FC<Props> = ({setInstructor}) => {
             </Grid>
           </Grid>)
       })}
+
+      {/* <Grid container style={{padding:'5%'}}>
+      <LeaderBoard />
+
+      </Grid> */}
 
 
 

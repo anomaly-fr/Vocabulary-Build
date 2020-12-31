@@ -256,6 +256,21 @@ app.get("/api/getWordsBySetId/:set_id", (req, res) => {
 });
 
 
+// get number of words in set
+app.get("/api/getNumberOfWordsBySetId/:set_id", (req, res) => {
+    const sqlSelect = "select count(set_id) from word where set_id=? group by (set_id);";
+    const set_id = req.params.set_id;
+    db.query(sqlSelect, [set_id], (error, result) => {
+        console.log("Result " + result);
+        console.log("Error " + error);
+
+        res.json(result);
+
+    });
+
+});
+
+
 
 // update best score
 app.post("/api/updateBestScore/:score_type", (req, res) => {
@@ -308,7 +323,7 @@ app.post("/api/updateBestScore/:score_type", (req, res) => {
 
 // Get stats per set
 app.get("/api/getSetStats/:set_id", (req, res) => {
-    const sqlQuery1 = "SELECT Max(best_score_quiz) AS highest_quiz_score, Max(best_score_audio) AS highest_audio_score, Avg(best_score_quiz)  AS average_quiz_score, Avg(best_score_audio) AS average_audio_score, email FROM score WHERE set_id = ?;";
+    const sqlQuery1 = "SELECT MAX(best_score_quiz) AS highest_quiz_score, MAX(best_score_audio) AS highest_audio_score, Avg(best_score_quiz)  AS average_quiz_score, Avg(best_score_audio) AS average_audio_score, email FROM score WHERE set_id = ?;";
     const sqlQuery2 = "SELECT email,best_score_audio,best_score_quiz,best_score_audio + best_score_quiz AS total,name FROM score JOIN tutee USING (email) ORDER  BY total DESC LIMIT  1;"
     const set_id = req.params.set_id;
     db.query(sqlQuery1, [set_id], (error1, result1) => {
@@ -347,6 +362,55 @@ app.get("/api/getLevelLeaderboard/:level_id", (req, res) => {
     });
 
 });
+
+
+// Get tutor stats
+app.get("/api/getTutorStats/:tutor_email", (req, res) => {
+    const sqlSelect = "select tutor_email,level_id,level_name,set_id,set_name,max(best_score_quiz) as highest_quiz_score,avg(best_score_quiz) as average_quiz_score,max(best_score_audio) as highest_audio_score,avg(best_score_audio) as average_quiz_score,avg(best_score_audio) as average_audio_score,max(total) as best_total,avg(total) as average_total from full_tutor_analysis where tutor_email='ak'  group by set_id ORDER BY level_name;"
+    // const sqlSelect = "SELECT TUTOR_email,level_id,level_name,set_id,set_name,MAX(best_score_quiz) AS highest_quiz_score,AVG(best_score_quiz) AS average_quiz_score, MAX(best_score_audio) as highest_audio_score,AVG(best_score_quiz) AS average_quiz_score,MAX(total) AS best_total,AVG(total) AS average_total FROM full_tutor_analysis WHERE tutor_email=? GROUP BY set_id ORDER BY level_name;";
+    const tutorEmail = req.params.tutor_email;
+    db.query(sqlSelect, [tutorEmail], (error, result) => {
+        console.log("Result " + result);
+        console.log("Error " + error);
+
+        res.json(result);
+
+    });
+
+});
+
+
+// Get per set stats for tutors
+app.get("/api/getTutorSetWiseStats/:set_id", (req, res) => {
+    const sqlSelect = "select score.email,name,set_id,best_score_audio,best_score_quiz from score join tutee using(email) where set_id=?;";
+    // const sqlSelect = "SELECT TUTOR_email,level_id,level_name,set_id,set_name,MAX(best_score_quiz) AS highest_quiz_score,AVG(best_score_quiz) AS average_quiz_score, MAX(best_score_audio) as highest_audio_score,AVG(best_score_quiz) AS average_quiz_score,MAX(total) AS best_total,AVG(total) AS average_total FROM full_tutor_analysis WHERE tutor_email=? GROUP BY set_id ORDER BY level_name;";
+    const setId = req.params.set_id;
+    db.query(sqlSelect, [setId], (error, result) => {
+        console.log("Result " + result);
+        console.log("Error " + error);
+
+        res.json(result);
+
+    });
+
+});
+
+app.get("/api/getLeaderboard", (req, res) => {
+    const sqlSelect = "select * from points;";
+    
+    // const sqlSelect = "SELECT TUTOR_email,level_id,level_name,set_id,set_name,MAX(best_score_quiz) AS highest_quiz_score,AVG(best_score_quiz) AS average_quiz_score, MAX(best_score_audio) as highest_audio_score,AVG(best_score_quiz) AS average_quiz_score,MAX(total) AS best_total,AVG(total) AS average_total FROM full_tutor_analysis WHERE tutor_email=? GROUP BY set_id ORDER BY level_name;";
+    db.query(sqlSelect, (error, result) => {
+        console.log("Result " + result);
+        console.log("Error " + error);
+
+        res.json(result);
+
+    });
+
+});
+
+
+
 
 
 

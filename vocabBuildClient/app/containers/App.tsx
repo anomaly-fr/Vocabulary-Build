@@ -10,6 +10,7 @@ import {
 import Home from '../components/Home';
 import AudioRound from './AudioRound';
 import HomePage from './HomePage';
+import LeaderBoard from './LeaderBoard';
 import Login from './Login';
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
           <Route exact path="/" component={Login} />
           <Route path="/home" component={HomePage} />
           <Route path="/audio" component={AudioRound} />
+          <Route path="/leaderboard" component={LeaderBoard} />
 
         </main>
       </div>

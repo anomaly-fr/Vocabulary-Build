@@ -75,7 +75,6 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
   const [answered, setAnswered] = useState<boolean>(false);
   const [open,setOpen] = useState<boolean>(false);
   const [bestScore,setBestScore] = useState<number>(0);
-  const [open,setOpen] = useState<boolean>(false);
 
 
   const [colours, setColours] = useState([

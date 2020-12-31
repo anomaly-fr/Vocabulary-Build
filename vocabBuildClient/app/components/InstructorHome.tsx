@@ -3,10 +3,12 @@ import { Grid, makeStyles, Typography } from '@material-ui/core';
 import { useHistory, useLocation } from 'react-router-dom';
 import FilterNoneIcon from '@material-ui/icons/FilterNone';
 import GroupIcon from '@material-ui/icons/Group';
+import EqualizerIcon from '@material-ui/icons/Equalizer';
 import TopBar from './AppBar';
 import Levels from './Levels';
 import { myConsole } from '../constants/constants';
 import MyLevels from './MyLevels';
+import InstructorStats from './InstructorStats';
 import { Theme } from '../constants/theme';
 
 export default function InstructorHome() {
@@ -68,18 +70,9 @@ export default function InstructorHome() {
     setCurrentMenuItem(set);
   };
 
-  return (
-    <Grid container>
-      <TopBar logout={() => {
-        history.goBack();
-        myConsole.log('Logout home')
-      }}
-      name={name}
-      levelNo={currentLevel} />
-
-
-
-      {currentMenuItem === 0 ? (
+  const renderContent = () => {
+    if (!currentMenuItem) {
+      return (
         <Grid container style={{ marginTop: '30vh' }}>
           <Grid
             container
@@ -106,24 +99,32 @@ export default function InstructorHome() {
               container
             >
               <Typography className={classes.menuItemNames}>
-                My Tutees
+                Statistics
               </Typography>
-              <GroupIcon />
+              <EqualizerIcon />
             </Grid>
-            <Grid item className={classes.item}>
-              <Typography className={classes.menuItemNames}>
-                My Tutees
-              </Typography>
-            </Grid>
+            {/* <Grid item className={classes.item}>
+            <Typography className={classes.menuItemNames}>
+              My Tutees
+            </Typography>
+            <EqualizerIcon />
+          </Grid> */}
           </Grid>
         </Grid>
-      ) : (
+      );
+    }
+    if (currentMenuItem === 1) {
+      return (
         <Grid
           container
-          style={{ flexDirection: 'column', justifyContent: 'flex-start' }}
+          style={{
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            flex: 1,
+          }}
         >
           <Typography className={classes.heading} variant="h4">
-            My levels
+            Stats
           </Typography>
 
           <MyLevels
@@ -133,7 +134,28 @@ export default function InstructorHome() {
             tutorEmail={location.state.email}
           />
         </Grid>
-      )}
+      );
+    } if (currentMenuItem === 2)
+      return (
+        <InstructorStats
+          setCurrentMenuItem={setCurrentMenuItem}
+          tutorEmail={location.state.email}
+        />
+      );
+  };
+
+  return (
+    <Grid container>
+      <TopBar
+        logout={() => {
+          history.goBack();
+          myConsole.log('Logout home');
+        }}
+        name={name}
+        levelNo={currentLevel}
+      />
+
+      {renderContent()}
     </Grid>
   );
   // return(<Login setLogged={setLogged} />)

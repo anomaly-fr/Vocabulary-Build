@@ -8,6 +8,7 @@ import Rounds from './Rounds';
 import {myConsole} from '../constants/constants';
 import Login from '../containers/Login';
 import ChooseInstructor from './ChooseInstructor';
+import LeaderBoard from '../containers/LeaderBoard';
 // eslint-disable-next-line import/no-mutable-exports
 
 
@@ -24,6 +25,7 @@ export default function Home() {
 
   const [name,setName] = useState<string>('Loading');
   const [email,setEmail] = useState<string>('');
+  const [leaderboard,showLeaderboard] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -56,6 +58,16 @@ export default function Home() {
   const setRound = (round : number) => {
     setCurrentRound(round);
   }
+
+  const handleLB = (lb:boolean) => {
+    myConsole.log('lbb')
+    showLeaderboard(lb);
+
+  }
+
+if(leaderboard)
+return(<LeaderBoard />)
+
   if(instructorChosen){
   //  setEmail(location.state.email);
     myConsole.log("Email alive "+email);
@@ -64,7 +76,10 @@ export default function Home() {
   return (
 
     <Grid container>
-      <TopBar logout={() => {
+      <TopBar leaderboard={() => {
+        showLeaderboard(true);
+      }}
+       logout={() => {
         history.goBack();
       }} email={email} name={name} levelNo={currentLevel} />
 
@@ -85,7 +100,6 @@ export default function Home() {
 
     </Grid>
 }
-
       </Grid>
 
   );
