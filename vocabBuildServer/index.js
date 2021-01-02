@@ -133,9 +133,10 @@ app.get("/api/getLevelsByTutor/:tutor_email", (req, res) => {
     const sqlSelect = "SELECT * FROM level WHERE tutor_email=?";
     const tutorEmail = req.params.tutor_email;
     db.query(sqlSelect, [tutorEmail], (error, result) => {
-        console.log("Result " + result);
+        console.log("Result " + JSON.stringify(result));
         console.log("Error " + error);
-
+        if(result == [] || result == null || result == undefined)
+        res.json('No levels')
         res.json(result);
     })
 
@@ -145,8 +146,7 @@ app.get("/api/getLevelsByTutor/:tutor_email", (req, res) => {
 
 // Get Sets and number of words in each set
 app.get("/api/getSetsByLevelNo/:level_id", (req, res) => {
-    console.log("body " + req.body);
-    const sqlSelect = "SELECT ls.set_id,set_name,level_id,w.set_id,COUNT(w.set_id) AS number_of_words FROM level_set ls JOIN word w ON (ls.set_id=w.set_id) WHERE level_id=? GROUP BY w.set_id;";
+    const sqlSelect = "SELECT * FROM vocab_builder.level_set where level_id=?";
     const levelNo = req.params.level_id;
     db.query(sqlSelect, [levelNo], (error, result) => {
         console.log("Result " + result);
@@ -171,10 +171,16 @@ app.post("/api/addWord", (req, res) => {
 
 
 
-    const sqlInsert = "INSERT INTO word (word_title,word_correct_def,word_incorrect_1,word_incorrect_2,word_incorrect_3,set_id) VALUES (?,?,?,?,?,?)";
+    
+    const sqlInsert = "INSERT INTO word (word_title,word_correct_def,word_incorrect_1,word_incorrect_2,word_incorrect_3,set_id) VALUES (?,?,?,?,?,?);";
+    const sqlUpdate = "UPDATE level_set SET number_of_words=(number_of_words+1) WHERE set_id=?";
     db.query(sqlInsert, [wordTitle, wordCorrectDef, wordIncorrect1, wordIncorrect2, wordIncorrect3, setNo], (error, result) => {
         console.log("Result " + result);
         console.log('Error ' + error)
+        db.query(sqlUpdate,[setNo],(err,res) => {
+            console.log("Result "+res);
+            console.log('Error ' + err);
+        })
         res.json(result);
     })
 });
@@ -258,7 +264,7 @@ app.get("/api/getWordsBySetId/:set_id", (req, res) => {
 
 // get number of words in set
 app.get("/api/getNumberOfWordsBySetId/:set_id", (req, res) => {
-    const sqlSelect = "select count(set_id) from word where set_id=? group by (set_id);";
+    const sqlSelect = "SELECT COUNT(set_id) AS number_of_words FROM word WHERE set_id=? GROUP BY (set_id);";
     const set_id = req.params.set_id;
     db.query(sqlSelect, [set_id], (error, result) => {
         console.log("Result " + result);
@@ -323,8 +329,8 @@ app.post("/api/updateBestScore/:score_type", (req, res) => {
 
 // Get stats per set
 app.get("/api/getSetStats/:set_id", (req, res) => {
-    const sqlQuery1 = "SELECT MAX(best_score_quiz) AS highest_quiz_score, MAX(best_score_audio) AS highest_audio_score, Avg(best_score_quiz)  AS average_quiz_score, Avg(best_score_audio) AS average_audio_score, email FROM score WHERE set_id = ?;";
-    const sqlQuery2 = "SELECT email,best_score_audio,best_score_quiz,best_score_audio + best_score_quiz AS total,name FROM score JOIN tutee USING (email) ORDER  BY total DESC LIMIT  1;"
+    const sqlQuery1 = "SELECT ifNull(MAX(best_score_quiz),0) AS highest_quiz_score, ifNull(MAX(best_score_audio),0) AS highest_audio_score,ifNull(Avg(best_score_quiz),0)  AS average_quiz_score, ifNull(Avg(best_score_audio),0) AS average_audio_score, ifNull(email,'-') FROM score WHERE set_id = ?;";
+    const sqlQuery2 = "SELECT ifNull(email,'-'),ifNull(best_score_audio,0),ifNull(best_score_quiz,0),ifNull((best_score_audio + best_score_quiz),0) AS total,name FROM score JOIN tutee USING (email) ORDER  BY total DESC LIMIT  1;"
     const set_id = req.params.set_id;
     db.query(sqlQuery1, [set_id], (error1, result1) => {
         console.log("Result " + JSON.stringify(result1));
@@ -400,6 +406,19 @@ app.get("/api/getLeaderboard", (req, res) => {
     
     // const sqlSelect = "SELECT TUTOR_email,level_id,level_name,set_id,set_name,MAX(best_score_quiz) AS highest_quiz_score,AVG(best_score_quiz) AS average_quiz_score, MAX(best_score_audio) as highest_audio_score,AVG(best_score_quiz) AS average_quiz_score,MAX(total) AS best_total,AVG(total) AS average_total FROM full_tutor_analysis WHERE tutor_email=? GROUP BY set_id ORDER BY level_name;";
     db.query(sqlSelect, (error, result) => {
+        console.log("Result " + result);
+        console.log("Error " + error);
+
+        res.json(result);
+
+    });
+
+});
+
+app.put("/api/markLookUp", (req, res) => {
+    const sqlUpdate = "UPDATE tutee SET look_ups = (look_ups+1) WHERE email=?;";
+    const email = req.body.user_email;
+    db.query(sqlUpdate,[email], (error, result) => {
         console.log("Result " + result);
         console.log("Error " + error);
 

@@ -36,9 +36,7 @@ export default function Home() {
     setName(location.state.name);
  }, []);
 
-  const setLogged = (log : number) => {
-   setIsLoggedIn(log)
-  }
+
   const setLevel = (level : number) => {
     myConsole.log(`Home level${  level}`)
     setCurrentLevel(level)
@@ -65,8 +63,11 @@ export default function Home() {
 
   }
 
-if(leaderboard)
-return(<LeaderBoard />)
+  const leaderboardFunct = () => {
+  myConsole.log('LLLL')
+  }
+
+
 
   if(instructorChosen){
   //  setEmail(location.state.email);
@@ -76,22 +77,17 @@ return(<LeaderBoard />)
   return (
 
     <Grid container>
-      <TopBar leaderboard={() => {
-        showLeaderboard(true);
-      }}
+      <TopBar leaderboard={leaderboardFunct}
        logout={() => {
         history.goBack();
       }} email={email} name={name} levelNo={currentLevel} />
 
 
-      <Grid container style={{marginTop:'10%'}}>
-     {/* <Typography onClick={() => {
-        history.goBack()
-      }}>back</Typography> */}
-     </Grid>
 
 
    {currentSet === '' ? <Grid container>
+
+
      <Levels setInstructorChosen={setInstructorChosen} instructorEmail={instructorChosen} setLevel={setLevel} setSet={setSet} />
 
 

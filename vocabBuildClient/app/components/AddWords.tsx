@@ -4,6 +4,9 @@ import { Grid, makeStyles, Typography, ThemeProvider, TextField , Button,Box } f
 import { useHistory } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Axios from 'axios';
 import Dialog from '@material-ui/core/Dialog';
@@ -30,13 +33,15 @@ const Transition = React.forwardRef(function Transition(
 
 
 const useStyles = makeStyles({
+
   container: {
 
-    padding: '2%',
-    backgroundColor: '#F9F9F9',
-    //  margin: '5%',
+    padding: '4%',
+    backgroundColor: theme.palette.secondary.dark,
+    overflow:'auto',    //  margin: '5%',
     borderRadius: 20,
-    alignSelf: 'center',
+    // paddingBottom: '6%',
+    // alignSelf: 'center',
     flex: 1,
   },
   heading: {
@@ -47,11 +52,11 @@ const useStyles = makeStyles({
   body: {
     //  margin: '10%',
     borderRadius: 20,
-    backgroundColor: 'white',
-    height: 300,
-    flex: 1,
+    backgroundColor: 'green',
+    overflow:'auto',
+    height:'auto',
     width: window.innerWidth,
-    paddingBottom: '5%'
+
   },
   createLevel: {
     fontWeight: 'bold',
@@ -69,6 +74,8 @@ const useStyles = makeStyles({
   },
   definitions: {
     color : 'white',
+
+
     backgroundColor: theme.palette.primary.light,
     borderRadius:5,
     margin:'0.5%',
@@ -135,6 +142,13 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
         fetchWords();
         setRandomData(Math.random());
 
+        setWordTitle('');
+        setWordCorrectDef('');
+        setWordIncorrect1('');
+        setWordIncorrect2('');
+        setWordIncorrect3('');
+
+
         return myConsole.log(`resp ${response.data}`);
       })
       .catch((error) => {
@@ -156,9 +170,9 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
 
   }
 
-  const handleShowDialog = (wor) => {
+  const handleShowDialog = () => {
 
-    setCurrentWord(wor);
+   // setCurrentWord(wor);
     setOpen(true);
   }
 
@@ -178,7 +192,7 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
 
   const classes = useStyles();
   return(<ThemeProvider theme={theme}>
-    <Grid container style={{padding: '10%',alignItems:'center',justifyContent:'center'}}>
+    <Grid container style={{padding: '10%',alignItems:'center',justifyContent:'center',overflow:'auto'}}>
     <Grid direction="column" container className={classes.container}>
     <Dialog
         open={open}
@@ -256,20 +270,19 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
 
           </Grid>
           {newWord ? (
-            <Grid item>
+            <Grid container>
 
               <TextField
-        //      style={{margin: '1%'}}
                 value={wordTitle}
                 size='small'
                 variant="outlined"
                 placeholder="Word Title"
                 onChange={(event) => setWordTitle(event.target.value)}
               />
-              <Grid container spacing={1} style={{width: window.innerWidth,padding: '0.5%'}}>
+              <Grid container direction='row' spacing={1} style={{padding: '0.5%',width:'100%',marginTop:'2%'}}>
               <TextField
               size='small'
-             // style={{margin : '1%'}}
+                style={{marginRight: 10,marginBottom:10}}
                 value={wordCorrectDef}
                 variant="outlined"
                 placeholder="Correct Definition"
@@ -277,7 +290,7 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
               />
                <TextField
               size='small'
-             // style={{margin : '1%'}}
+              style={{marginRight: 10}}
 
                 value={wordIncorrect1}
                 variant="outlined"
@@ -286,7 +299,7 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
               />
                <TextField
               size='small'
-           //   style={{margin : '1%'}}
+              style={{marginRight: 10}}
 
                 value={wordIncorrect2}
                 variant="outlined"
@@ -331,11 +344,8 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
           {words.map((wor, idx) => {
             return (
               <Grid
-              onClick={() => {
-                wor.id = !wor.id;
-                setRandomData(Math.random());
-              //  fetchWords();
-              }}
+              style={{marginBottom:'5%'}}
+
                 className={classes.level}
                 style={{ backgroundColor: Theme.palette.primary.dark }}
                 container
@@ -343,11 +353,32 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
               >
 
 
+
+                <Grid
+
+
+                 container direction='row' justify='space-between'>
                 <Typography
 
-                 style={{ color: 'white'}}>
-                  {wor.word_title}
-                </Typography>
+style={{ color: 'white'}}>
+ {wor.word_title}
+</Typography>
+                {!words.id ? <ExpandMoreIcon
+                onClick={() => {
+                  wor.id = !wor.id;
+                  setRandomData(Math.random());
+                //  fetchWords();
+                }}
+                 /> : <ExpandLessIcon
+                 onClick={() => {
+                  wor.id = !wor.id;
+                  setRandomData(Math.random());
+                //  fetchWords();
+                }}
+                  />}
+
+                  </Grid>
+
                  {wor.id ? <Grid container direction='column'>
                   <Typography style={{backgroundColor: 'lightgreen'}} className={classes.definitions}>{wor.word_correct_def}</Typography>
 
@@ -357,7 +388,9 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
                   <Grid item style={{justifyContent:'flex-end',marginTop:20}}>
                     <Button
                     onClick={() => {
-                      handleShowDialog(wor)
+                      myConsole.log('ok')
+                      setCurrentWord(wor)
+                      handleShowDialog()
                     }}
                     style={{alignSelf: 'flex-end'}} color='primary' variant="contained">
                       Delete word

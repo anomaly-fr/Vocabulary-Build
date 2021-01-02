@@ -104,16 +104,22 @@ const AudioCard: React.FC<Props> = ({setCurrentRound,setId}) => {
   // myConsole.log(voices.length)
 
 const validate = () => {
-  if(spelling.toLowerCase() === words[questionNumber].word_title.toLowerCase()){
-    setScore(score+1);
-    setSpelling('')
-    setText('Correct')
-    setAnswered(true);
-  return 'Correct';
+  if(!answered){
+    if(spelling.toLowerCase() === words[questionNumber].word_title.toLowerCase()){
+      setScore(score+1);
+      setSpelling('')
+      setText('Correct')
+      setAnswered(true);
+    return 'Correct';
+
+  }
+
 
   }
 
   setText(`Incorrect. The correct spelling is ${words[questionNumber].word_title}.`)
+  setAnswered(true);
+
   return 'Incorrect'
 
 }
@@ -264,8 +270,8 @@ const updateScore = () => {
                         </Button>
 
      </Grid>
-     <Grid item style={{marginTop: '2%',color: theme.palette.primary.dark}}>
-     <Typography style={{backgroundColor: theme.palette.primary.dark,padding:'2%',color: 'white',borderRadius:5}}>{text}</Typography>
+     <Grid item style={{marginTop: '2%',color: theme.palette.primary.dark,width:100,alignItems:'center',justifyContent:'center'}}>
+     <Typography style={{backgroundColor: theme.palette.primary.dark,padding:'1%',color: 'white',borderRadius:5,width:'100%',justifyContent:'center',textAlign:'center'}}>{text}</Typography>
 
      </Grid>
 

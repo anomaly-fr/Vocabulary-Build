@@ -123,9 +123,6 @@ export default function InstructorHome() {
             flex: 1,
           }}
         >
-          <Typography className={classes.heading} variant="h4">
-            Stats
-          </Typography>
 
           <MyLevels
             level={currentLevel}

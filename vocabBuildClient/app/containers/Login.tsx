@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   Typography,
   Button,
@@ -11,32 +10,31 @@ import {
   Grid,
   Paper,
 } from '@material-ui/core';
-import React, { useState, useEffect } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import Axios from 'axios';
 import 'fontsource-roboto';
 import { Theme } from '../constants/theme';
 import { myConsole } from '../constants/constants';
+import WordAnimation from '../components/letterAnimation';
 
 const theme = Theme;
 interface Props {
-  setLogged : (log : number) => void
+  setLogged: (log: number) => void;
 }
-const Login : React.FC<Props> = () => {
+const Login: React.FC<Props> = () => {
   const history = useHistory();
   const [account, hasAccount] = useState(true);
   const [userEmail, setEmail] = useState<string>('');
-  const [tutorEmail,setTutorEmail] = useState<string>('');
+  const [tutorEmail, setTutorEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [cpassword, setCPassword] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [message, setMessage] = useState<string>('');
 
-  const [instructor,isInstructor] = useState<boolean>(false);
+  const [instructor, isInstructor] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const classes = useStyles();
-
-
 
   const createTutorAccount = () => {
     // myConsole.log(name)
@@ -48,7 +46,7 @@ const Login : React.FC<Props> = () => {
       password,
     })
       .then((response) => {
-        setMessage('Successful')
+        setMessage('Successful');
         hasAccount(true);
         return myConsole.log(`resp ${response.data}`);
         //   history.push('/home');
@@ -58,18 +56,15 @@ const Login : React.FC<Props> = () => {
       });
   };
 
-
   const createAccount = () => {
-    // myConsole.log(name)
-    // myConsole.log(email)
-    // myConsole.log(password)
+
     Axios.post('http://localhost:3000/api/register', {
       email: userEmail,
       name,
       password,
     })
       .then((response) => {
-        setMessage('Successful')
+        setMessage('Successful');
         hasAccount(true);
         return myConsole.log(`resp ${response.data}`);
         //   history.push('/home');
@@ -82,26 +77,26 @@ const Login : React.FC<Props> = () => {
     setMessage('Logging in');
     Axios.get(`http://localhost:3000/api/login/${userEmail}`)
       .then((response) => {
-        myConsole.log(`Login response ${JSON.stringify(response.data[0])}`)
-        if(response.data[0] === undefined){
-          setMessage('User not found')
+        myConsole.log(`Login response ${JSON.stringify(response.data[0])}`);
+        if (response.data[0] === undefined) {
+          setMessage('User not found');
           return;
         }
         // eslint-disable-next-line promise/always-return
-        if(response.data[0].password !== password){
-          setMessage('Password incorrect')
-     }
-     else {
-       history.push({
-       pathname: '/home',
-       state: {
-          name : response.data[0].name,
-          email : response.data[0].email,
-          userType : 'tutee'
-       }})
-      //  setLogged(1);
-      //  myConsole.log("Wha")
-     }
+        if (response.data[0].password !== password) {
+          setMessage('Password incorrect');
+        } else {
+          history.push({
+            pathname: '/home',
+            state: {
+              name: response.data[0].name,
+              email: response.data[0].email,
+              userType: 'tutee',
+            },
+          });
+          //  setLogged(1);
+          //  myConsole.log("Wha")
+        }
       })
       .catch((e) => {
         myConsole.log(e);
@@ -112,25 +107,23 @@ const Login : React.FC<Props> = () => {
     Axios.get(`http://localhost:3000/api/loginTutor/${tutorEmail}`)
       .then((response) => {
         myConsole.log(`"RESPONSE "+${response.data[0]}`);
-        if(response.data[0] === undefined)
-        setMessage('User not found');
+        if (response.data[0] === undefined) setMessage('User not found');
         // eslint-disable-next-line promise/always-return
-        if(response.data[0].password !== password){
-          setMessage('Password incorrect')
-     }
-     else {
-       myConsole.log("What")
-       history.push({
-       pathname: '/home',
-       state: {
-          name : response.data[0].name,
-          email : response.data[0].tutor_email,
-          userType : 'tutor'
-
-       }})
-        //setLogged(1);
-      //  myConsole.log("Wha")
-     }
+        if (response.data[0].password !== password) {
+          setMessage('Password incorrect');
+        } else {
+          myConsole.log('What');
+          history.push({
+            pathname: '/home',
+            state: {
+              name: response.data[0].name,
+              email: response.data[0].tutor_email,
+              userType: 'tutor',
+            },
+          });
+          //setLogged(1);
+          //  myConsole.log("Wha")
+        }
       })
       .catch((e) => {
         myConsole.log(e);
@@ -141,16 +134,20 @@ const Login : React.FC<Props> = () => {
       <Grid container component="main" className={classes.root}>
         <Grid container direction="row" className={classes.main}>
           <Grid item xs={false} sm={4} md={7}>
-            <Paper elevation={0} variant="outlined">
+
               <Typography
                 className={classes.text}
                 variant="h4"
                 component="h5"
-                align="center"
+
               >
-                Vocab Builder
+                Vocabulary Builder
               </Typography>
-            </Paper>
+              <Grid container style={{padding:'4%'}}>
+              <WordAnimation />
+
+              </Grid>
+
           </Grid>
           <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6}>
             <div className={classes.paper}>
@@ -159,21 +156,19 @@ const Login : React.FC<Props> = () => {
               </Typography>
 
               <FormControlLabel
-
-        control={
-          <Checkbox
-            checked={instructor}
-            onChange={() => {
-              isInstructor(!instructor);
-            }}
-            name="checkedB"
-            color="primary"
-          />
-        }
-        label="Instructor?"
-      />
-
-
+              style={{flex:1,fontWeight:'bold',width:'100%',alignSelf:'center',alignItems:'center',justifyContent:'center'}}
+                control={
+                  <Checkbox
+                    checked={instructor}
+                    onChange={() => {
+                      isInstructor(!instructor);
+                    }}
+                    name="checkedB"
+                    color="primary"
+                  />
+                }
+                label="Instructor?"
+              />
 
               <form
                 className={classes.form}
@@ -207,7 +202,11 @@ const Login : React.FC<Props> = () => {
                   autoComplete="email"
                   autoFocus
                   value={instructor ? tutorEmail : userEmail}
-                  onChange={(event) => instructor ?  setTutorEmail(event.target.value) : setEmail(event.target.value)}
+                  onChange={(event) =>
+                    instructor
+                      ? setTutorEmail(event.target.value)
+                      : setEmail(event.target.value)
+                  }
                 />
                 <TextField
                   size="small"
@@ -255,9 +254,9 @@ const Login : React.FC<Props> = () => {
                               setMessage('Please enter all fields');
                             } else if (cpassword !== password) {
                               setMessage('Passwords do not match');
-                            } if(instructor)
-                              createTutorAccount()
-                              else createAccount()
+                            }
+                            if (instructor) createTutorAccount();
+                            else createAccount();
                           } catch (e) {
                             myConsole.log(e);
                           }
@@ -266,14 +265,14 @@ const Login : React.FC<Props> = () => {
                       >
                         Create Account
                       </Button>
-                      <Grid container style={{ margin: '2%' }}>
-                        <Typography style={{ color: 'red' }}>
+                      <Grid container style={{ margin: '2%',alignItems:'center',justifyContent:'center' }}>
+                        <Typography style={{ color: 'red',textAlign:'center',width:'100%' }}>
                           {message}
                         </Typography>
                       </Grid>
                     </Grid>
 
-                    <Grid container>
+                    <Grid container style={{justifyContent:'center'}}>
                       <Button
                         style={{ fontSize: 14 }}
                         onClick={() => hasAccount(true)}
@@ -294,29 +293,32 @@ const Login : React.FC<Props> = () => {
                         color="primary"
                         className={classes.submit}
                         onClick={() => {
-                          if (((!instructor && userEmail === '') || password === '')||((instructor && tutorEmail === '') || password === '')) {
+                          if (
+                            (!instructor && userEmail === '') ||
+                            password === '' ||
+                            (instructor && tutorEmail === '') ||
+                            password === ''
+                          ) {
                             setMessage('Please enter all fields');
                           } else {
                             // eslint-disable-next-line no-lonely-if
-                            if(!instructor)
-                            login();
-                            else
-                             loginTutor();
+                            if (!instructor) login();
+                            else loginTutor();
                           }
                         }}
                       >
                         Sign In
                       </Button>
-                      <Grid container style={{ margin: '2%' }}>
+                      <Grid container style={{ margin: '2%',alignItems:'center',justifyContent:'center' }}>
                         <Typography style={{ color: 'red' }}>
                           {message}
                         </Typography>
                       </Grid>
                     </Grid>
 
-                    <Grid container>
+                    <Grid container style={{alignItems:'center',justifyContent:'center'}}>
                       <Button
-                        style={{ fontSize: 14 }}
+                        style={{ fontSize: 14,alignSelf:'center'}}
                         onClick={() => hasAccount(false)}
                         variant="text"
                       >
@@ -355,10 +357,11 @@ const useStyles = makeStyles({
     margin: '5%',
     borderWidth: 0.5,
     fontWeight: 'bold',
-    // color : '#6F47A7'
+    fontSize:35
+
   },
   paper: {
-    margin: '10%',
+    margin: '5%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -366,10 +369,10 @@ const useStyles = makeStyles({
 
   form: {
     width: '100%', // Fix IE 11 issue.
-    marginTop: '10%',
+    marginTop: '5%',
   },
   submit: {
-    margin: '10%',
+    margin: '5%',
     alignSelf: 'center',
   },
 });

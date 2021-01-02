@@ -24,7 +24,7 @@ const useStyles = makeStyles({
 
 
 
-const LeaderBoard : React.FC = ({leaderBoard}) => {
+export default function LeaderBoard() {
   const history = useHistory();
   const [board,setBoard] = useState([]);
   const getLeaderBoard = () => {
@@ -44,11 +44,15 @@ const LeaderBoard : React.FC = ({leaderBoard}) => {
     getLeaderBoard();
 
     },[])
-  return(<Grid container style={{margin: '10%',padding:'5%'}}>
-    <Grid container direction='row'  style={{backgroundColor: 'white',borderRadius:10,flex:1,justifyContent:'center',alignItems:'center'}}>
+  return(<Grid container>
+    <Grid container direction='row'  style={{backgroundColor: 'white',borderRadius:10,flex:1,justifyContent:'center',alignItems:'center',padding:'2%'}}>
       <Grid container style={{margin:'1%'}}>
-      <ArrowBackIcon onClick={() => {
-        history.push('/home');
+      <ArrowBackIcon
+      onMouseEnter={() => {
+
+      }}
+      onClick={() => {
+      //   history.goBack();
 
       }}/>
 
@@ -56,7 +60,7 @@ const LeaderBoard : React.FC = ({leaderBoard}) => {
       <Typography style={{margin:'2%',fontWeight:'bold'}}>Leaderboard</Typography>
       <Grid container direction='column'>
         {board.map((person,inx) => {
-          return(<Grid container direction='row' justify='space-between' key={inx.toString()} style={{backgroundColor: theme.palette.primary.dark,margin:'1%',padding:'1%',borderRadius:10,alignSelf:'center',width: 1100}}>
+          return(<Grid container direction='row' justify='space-between' key={inx.toString()} style={{backgroundColor: theme.palette.primary.dark,margin:'1%',padding:'1%',borderRadius:10}}>
               <Typography style={{color:'white'}}>{(inx+1).toString()}</Typography>
 
                 <Typography style={{color:'white'}}>{person.name}</Typography>
@@ -76,4 +80,3 @@ const LeaderBoard : React.FC = ({leaderBoard}) => {
   </Grid>)
 };
 
-export default LeaderBoard;

@@ -66,13 +66,17 @@ interface Props {
   level: number;
   set: string;
   tutorEmail: string;
-  setCurrentMenuItem : (item : number) => void;
+  setCurrentMenuItem: (item: number) => void;
 }
 
-const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }) => {
+const MyLevels: React.FC<Props> = ({
+  level,
+  set,
+  tutorEmail,
+  setCurrentMenuItem,
+}) => {
   myConsole.log('My Levels');
 
-  const history = useHistory();
   const classes = useStyles();
   const [levels, setLevels] = useState([]);
   const [sets, setSets] = useState([]);
@@ -82,15 +86,16 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }
   const [setName, setSetName] = useState<string>('');
   const [levelSel, setLevelSel] = useState<number>(0);
   const [setSel, setSetSel] = useState<number>(0);
+  const [message, setMessage] = useState<string>('');
 
   const fetchSets = (levelNo) => {
-    myConsole.log('Fetching sets');
+    myConsole.log('Fetching sets for '+levelNo);
     Axios.get(`http://localhost:3000/api/getSetsByLevelNo/${levelNo}`)
       .then((response) => {
         setSets(response.data);
         setLevelSel(levelNo);
 
-        myConsole.log(`Sets ${response.data}`);
+        myConsole.log(`Sets ${JSON.stringify(response.data)}`);
 
         return myConsole.log(sets);
       })
@@ -104,7 +109,7 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }
       .then((response) => {
         setLevels(response.data);
 
-        myConsole.log(`Levels ${response.data}`);
+        myConsole.log(`Levels: ${response.data.length}`);
         // setLevelSel(response.data.le)
         //   fetchSets();
 
@@ -145,6 +150,8 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }
         setSetName('');
         fetchSets(levelSel);
 
+        myConsole.log('Level now is '+levelSel)
+
         return myConsole.log(`resp ${response.data}`);
       })
       .catch((error) => {
@@ -174,10 +181,11 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }
                   alignSelf: 'center',
                 }}
               >
-                <Grid item
-                onClick={() => {
-                  setCurrentMenuItem(0);
-                }}
+                <Grid
+                  item
+                  onClick={() => {
+                    setCurrentMenuItem(0);
+                  }}
                 >
                   <ArrowBackIcon />
                 </Grid>
@@ -223,23 +231,33 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }
                 ) : null}
               </Grid>
               <Grid style={{ flex: 1, alignSelf: 'center', marginTop: '2%' }}>
-                {levels.map((lev, idx) => {
-                  return (
-                    <Grid
-                      onClick={() => {
-                        fetchSets(lev.level_id);
-                      }}
-                      className={classes.level}
-                      style={{ backgroundColor: Theme.palette.primary.dark }}
-                      container
-                      key={idx.toString()}
-                    >
-                      <Typography style={{ color: 'white' }}>
-                        {lev.level_name}
-                      </Typography>
-                    </Grid>
-                  );
-                })}
+                {levels.length === 0 ? (
+                  <Grid container style={{flex:1,margin:'3%'}}>
+                    <Typography style={{color:'gray',fontSize:14}}>No levels yet</Typography>
+                  </Grid>
+                ) : (
+                  <Grid container>
+                    {levels.map((lev, idx) => {
+                      return (
+                        <Grid
+                          onClick={() => {
+                            fetchSets(lev.level_id);
+                          }}
+                          className={classes.level}
+                          style={{
+                            backgroundColor: Theme.palette.primary.dark,
+                          }}
+                          container
+                          key={idx.toString()}
+                        >
+                          <Typography style={{ color: 'white' }}>
+                            {lev.level_name}
+                          </Typography>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
+                )}
               </Grid>
             </Grid>
           </Grid>
@@ -265,12 +283,11 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }
                   setLevelSel(0);
                 }}
                 item
-                style={{ flex:1 }}
+                style={{ flex: 1 }}
               >
-                 <Grid item>
-                 <ArrowBackIcon />
-
-                 </Grid>
+                <Grid item>
+                  <ArrowBackIcon />
+                </Grid>
               </Grid>
 
               <Grid
@@ -279,17 +296,23 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }
                 direction="row"
                 style={{ alignItems: 'center' }}
               >
-                <Grid container style={{alignItems: 'center',margin: '2%',marginTop:'8%'}}>
+                <Grid
+                  container
+                  style={{
+                    alignItems: 'center',
+                    margin: '2%',
+                    marginTop: '8%',
+                  }}
+                >
                   <Grid item>
-                  <AddCircleOutlineIcon
-                    onClick={() => {
-                      showNewSet(!newSet);
-                    }}
-                  />
+                    <AddCircleOutlineIcon
+                      onClick={() => {
+                        showNewSet(!newSet);
+                      }}
+                    />
                   </Grid>
 
-                  <Typography
-                   className={classes.createLevel}>
+                  <Typography className={classes.createLevel}>
                     Create Set{' '}
                   </Typography>
                 </Grid>
@@ -317,8 +340,11 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }
                   </Grid>
                 ) : null}
               </Grid>
-              <Grid style={{ flex: 1,marginTop:'2%' }}>
-                {sets.map((se, idx) => {
+              <Grid style={{ flex: 1, marginTop: '2%' }}>
+                {sets.length === 0 ? <Grid container style={{flex:1,margin:'3%'}}>
+                    <Typography style={{color:'gray',fontSize:14}}>No Sets yet</Typography>
+                  </Grid> : <Grid container>
+                  {sets.map((se, idx) => {
                   return (
                     <Grid
                       onClick={() => {
@@ -335,6 +361,8 @@ const MyLevels: React.FC<Props> = ({ level, set, tutorEmail,setCurrentMenuItem }
                     </Grid>
                   );
                 })}
+                    </Grid> }
+
               </Grid>
             </Grid>
           </Grid>

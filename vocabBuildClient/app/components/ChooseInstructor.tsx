@@ -76,7 +76,7 @@ const ChooseInstructor : React.FC<Props> = ({setInstructor}) => {
     Axios.get('http://localhost:3000/api/getAllTutors')
     .then((response) => {
       setTutors(response.data);
-      return myConsole.log("N "+numbers)
+      return myConsole.log(numbers)
 
     }).catch((error) => {
       myConsole.log(error)
@@ -96,24 +96,26 @@ const ChooseInstructor : React.FC<Props> = ({setInstructor}) => {
         myConsole.log('Logout choose inst')
       }} />
 
-      <Grid container style={{ marginTop: '10%' }}>
-        {/* <Typography
-          onClick={() => {
-            history.goBack();
-          }}
-        >
-          Logout
-        </Typography> */}
+      <Grid container style={{ marginTop: '5%' }}>
+      <Grid container>
+     <Typography style={{fontSize:24,color:'white',margin:'2%',fontWeight:'bold'}}>
+       Choose an instructor
+     </Typography>
+     </Grid>
       </Grid>
 
       {tutors.map((tut,inx) => {
         myConsole.log(tut)
         return(<Grid
+        style={{cursor:'pointer'}}
+        onMouseEnter={() => {
+
+        }}
         onClick={() => {
           setInstructor(tut.tutor_email)
         }}
          key={inx.toString()} className={classes.square} container>
-          <Typography>{tut.name}</Typography>
+          <Typography style={{alignSelf:'center'}}>{tut.name}</Typography>
           <Typography style={{fontSize:16}}>{tut.number_of_words}</Typography>
           <Grid style={{alignSelf: 'flex-end',backgroundColor: theme.palette.primary.light,borderBottomRightRadius:20,borderBottomLeftRadius:20,padding:'2%',justifyContent:'center'}} container>
           <Typography style={{fontSize:14}} >{`Levels: ${tut.number_of_levels}`}</Typography>

@@ -173,7 +173,7 @@ const Levels: React.FC<Props> = ({
   const getStats = (setId:number) => {
     Axios.get(`http://localhost:3000/api/getSetStats/${setId}`)
       .then((response) => {
-        handleShowDialog();
+       handleShowDialog();
 
         setSetStats(response.data);
         return myConsole.log(`Sets stats ${JSON.stringify(response.data)}`);
@@ -326,15 +326,15 @@ const Levels: React.FC<Props> = ({
          Set Top Scorer Name
           </DialogContentText>
           <DialogContentText style={{color:'white',fontSize:14}}>
-         {setStats.topper[0].name}
+         {setStats.topper.length === 0? '-' : setStats.topper[0].name}
           </DialogContentText>
          </Grid>
          <Grid container justify='space-between'>
          <DialogContentText style={{color:'white',fontSize:14}}>
-         Toper's total
+         Topper's total
           </DialogContentText>
           <DialogContentText style={{color:'white',fontSize:14}}>
-         {setStats.topper[0].total}
+          {setStats.topper.length === 0? '-' : setStats.topper[0].total}
           </DialogContentText>
          </Grid>
          </Grid>
@@ -355,10 +355,15 @@ const Levels: React.FC<Props> = ({
         <DialogTitle id="alert-dialog-slide-title">Leaderboard</DialogTitle>
         <DialogContent style={{backgroundColor: theme.palette.primary.dark,borderRadius:20,margin:'2%'}}>
       {board.map((row,inx) => {
+        myConsole.log(JSON.stringify("b "+board.length))
+        if(board.length === 0)
+        return <Grid>
+          <Typography>No competitors yet</Typography>
+        </Grid>
         return(<Grid style={{backgroundColor:theme.palette.primary.dark,margin:'1%'}} container justify='space-between' key={inx.toString()}>
           <Grid container justify='space-between' direction='row' style={{backgroundColor: theme.palette.primary.light,margin: '1%',padding:'1%',alignItems:'center',borderRadius:5,flex:1,width:300}}>
           <DialogContentText style={{color:'white',fontSize:16,alignSelf:'center'}}>
-{`${(inx+1).toString()}. ${row.name}`}
+{`${(inx+1).toString()}. Level ${row.name}`}
         </DialogContentText>
 
         <DialogContentText style={{color:'white',fontSize:16,alignSelf: 'center'}}>
@@ -373,7 +378,7 @@ const Levels: React.FC<Props> = ({
         </DialogContent>
 
       </Dialog>
-      <Grid container style={{ flex: 1, alignSelf: 'flex-start' }}>
+      <Grid container style={{ flex: 1, alignSelf: 'flex-start',marginTop:'5%' }}>
         <ArrowBackIcon
           onClick={() => {
             setInstructorChosen(0);
@@ -383,15 +388,15 @@ const Levels: React.FC<Props> = ({
         <Grid
           container
           direction="column"
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          style={{ flex: 1, justifyContent: 'center' }}
         >
-          <Typography style={{ fontSize: 20,color:'white',fontWeight:'bold' }}>Levels </Typography>
         </Grid>
 
-        <Grid container>
+        <Grid container style={{marginTop:'3%'}}>
           {levelsFetched.map((lev, inx) => (
             <Box
               key={inx.toString()}
+              style={{cursor:'pointer'}}
               border={6}
               borderRadius={26}
               borderColor={lev.id ? theme.palette.primary.dark : 'transparent'}
@@ -441,7 +446,6 @@ const Levels: React.FC<Props> = ({
                 alignItems: 'center',
               }}
             >
-              <Typography style={{ fontSize: 20,color:'white',fontWeight:'bold',marginTop:'3%'} }>Sets </Typography>
             </Grid>
             {sets.map((set, inx) => {
               return (

@@ -24,7 +24,6 @@ import { Theme } from '../constants/theme';
 import { myConsole } from '../constants/constants';
 
 import AddWords from './AddWords';
-import InstructorHome from './InstructorHome';
 
 const theme = Theme;
 
@@ -85,6 +84,7 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
   const [stats, setStats] = useState([]);
   const [setStat,setSetStat] = useState([]);
   const [open,setOpen] = useState<boolean>(false);
+
   const [currentSet,setCurrentSet] = useState<number>(0);
 
 
@@ -101,18 +101,23 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
   const fetchSetStats = (setId) => {
     Axios.get(`http://localhost:3000/api/getTutorSetWiseStats/${setId}`)
       .then((response) => {
-        Axios.get(`http://localhost:3000/api/getNumberOfWordsBySetId/${setId}`)
-    .then((resp) => {
+         Axios.get(`http://localhost:3000/api/getNumberOfWordsBySetId/${setId}`)
+     .then((resp) => {
+      myConsole.log('nummm '+ JSON.stringify(resp.data));
 
-      setSetStat(response.data);
+      let setFinalStat = {
+        ...response.data,
+        total: resp.data
+      }
+      setSetStat(setFinalStat);
 
-      return myConsole.log('nummm '+ resp.data);
-    })
-    .catch((e) => {
-      myConsole.log(e);
-    });
+       return myConsole.log(JSON.stringify(setFinalStat));
+     })
+     .catch((e) => {
+       myConsole.log(e);
+     });
         handleShowDialog();
-        return myConsole.log(levels);
+        return myConsole.log("SET STATS "+JSON.stringify(response.data));
       })
       .catch((e) => {
         myConsole.log(e);
@@ -125,7 +130,7 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
       .then((response) => {
 
        setStats(response.data)
-        return myConsole.log(levels);
+        return myConsole.log("stats "+response.data);
       })
       .catch((e) => {
         myConsole.log(e);
@@ -134,30 +139,32 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
 
   useEffect(() => {
     fetchStats();
+    myConsole.log('Effected')
   }, [tutorEmail]);
 
 
-  const renderGraph = async () => {
+  const renderGraph = () => {
 
 
     // Get the number of words in this set
 
 
     const content=[];
-    for(const i in setStat){
+    for(let i in setStat){
        const obj={
          name: setStat[i].name,
          mark: setStat[i].best_score_audio + setStat[i].best_score_quiz,
-         total: 5
+         total: setStat[i].total
        }
        content.push(obj);
 
     }
-    const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+    const genRanHex = (size:number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+
     return(content.map((bar,inx) => {
       return(<Grid direction='row' style={{width:500,height:100,padding:0,paddingTop:'5%',paddingBottom:'5%',margin:'1%',backgroundColor:'white'}} key={inx.toString()} container>
         <Grid container
-        style={{width:(bar.mark/bar.total)*100,height:40,backgroundColor:`#${genRanHex(6)}`}}
+        style={{width:(bar.mark/5)*100,height:40,backgroundColor:`#${genRanHex(6)}`}}
           />
          <Grid style={{height:40,alignItems:'center',justifyContent:'center',margin:'1%'}}>
          <Typography style={{fontSize:12,color:'black'}}>{`${bar.name}`}</Typography>
@@ -183,7 +190,10 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
           <Box border={4}>
+            <Grid>
             {renderGraph()}
+
+            </Grid>
 
           </Box>
 
@@ -204,7 +214,7 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
             return(<Grid direction='column' container key={inx.toString()} style={{backgroundColor: theme.palette.primary.light,borderRadius:10,alignItems:'center',margin:10,alignSelf:'center'}}>
             <Grid container justify='space-between' style={{backgroundColor:theme.palette.primary.dark,borderRadius:10,margin:'1.5%',padding:'2%',alignSelf:'center',width:'90%'}}>
             <Typography style={{color:'white',fontWeight:'bold'}}>Set:</Typography>
-             <Typography style={{color:'white',fontWeight:'bold'}}>Level"</Typography>
+             <Typography style={{color:'white',fontWeight:'bold'}}>Level</Typography>
              <Grid container justify='space-between'>
              <Typography style={{color:'white'}}>{stat.set_name}</Typography>
              <Typography style={{color:'white'}}>{stat.level_name}</Typography>
@@ -236,13 +246,16 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
                     <Typography style={{color:'white',fontWeight:'bold'}} >Average Total</Typography>
                     <Typography style={{color:'white'}}>{stat.average_total}</Typography>
                   </Grid>
-                <Grid container style={{flex:1, justifyContent:'flex-end', padding:5,backgroundColor:theme.palette.primary.light,borderRadius:5}}>
+                  <Grid container style={{justifyContent:'flex-end'}}>
+                  <Grid item style={{ justifyContent:'flex-end', padding:5,backgroundColor:theme.palette.primary.light,borderRadius:5}}>
                 <Equalizer onClick={() => {
                   // setCurrentSet(stat.set_id);
                   fetchSetStats(stat.set_id);
                 }} style={{color:'white'}} />
 
                   </Grid>
+                    </Grid>
+
 
                 </Grid>
               </Grid>)
@@ -255,5 +268,5 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
           </ThemeProvider>);
 
               }
-              export default InstructorStats;
+ export default InstructorStats;
 
