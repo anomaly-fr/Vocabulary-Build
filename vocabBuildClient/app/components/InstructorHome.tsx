@@ -54,6 +54,7 @@ export default function InstructorHome() {
 
   useEffect(() => {
     myConsole.log(`Welcome Sir ${location.state.name}`);
+    window.localStorage.setItem("userType","tutor");
     setName(location.state.name);
   }, [location]);
 
@@ -80,6 +81,7 @@ export default function InstructorHome() {
             style={{ flex: 1, alignItems: 'center' }}
           >
             <Grid
+             style={{cursor:'pointer'}}
               onClick={() => {
                 setCurrentMenuItem(1);
               }}
@@ -92,13 +94,14 @@ export default function InstructorHome() {
               <FilterNoneIcon />
             </Grid>
             <Grid
+            style={{cursor:'pointer'}}
               onClick={() => {
                 setCurrentMenuItem(2);
               }}
               className={classes.item}
               container
             >
-              <Typography className={classes.menuItemNames}>
+              <Typography  className={classes.menuItemNames}>
                 Statistics
               </Typography>
               <EqualizerIcon />

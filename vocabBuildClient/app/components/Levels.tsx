@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
 
 import {
@@ -26,8 +25,8 @@ import { myConsole } from '../constants/constants';
 import { Theme } from '../constants/theme';
 
 const levelDimensions = {
-  width: window.innerWidth / 10,
-  height: window.innerHeight / 5,
+  width: window.innerWidth / 9,
+  height: window.innerHeight / 4,
 };
 
 const theme = Theme;
@@ -47,7 +46,7 @@ const useStyles = makeStyles({
   text: {
     color: theme.palette.secondary.main,
     //   fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 16,
     marginTop: 10,
     //   alignSelf: 'center'
   },
@@ -101,16 +100,26 @@ const Levels: React.FC<Props> = ({
 }) => {
   const [level, selLevel] = useState<number>(0);
   const [levelsFetched, setLevelsFetched] = useState([]);
-  const [finalSet,setFinalSet] = useState<number>(0);
+  const [finalSet, setFinalSet] = useState<number>(0);
   const [randomData, setRandomData] = useState(0);
-  const [open,setOpen] = useState<boolean>(false);
-  const [openBoard,setOpenBoard] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const [openBoard, setOpenBoard] = useState<boolean>(false);
   const [sets, setSets] = useState([]);
   const AnimatedGrid = animated(Grid);
   const AnimatedText = animated(Typography);
   const AnimatedCard = animated(Card);
-  const [setStats,setSetStats] = useState({"stats":[{"highest_quiz_score":-1,"highest_audio_score":-1,"average_quiz_score":-1,"average_audio_score":-1,"email":"Loading"}],"topper":[{"email":"Loading","best_score_audio":-1,"best_score_quiz":-1,"total":-1,"name":"Loading"}]});
-  const [board,setBoard] = useState([{"email":"","level_total":-1,"name":""}]);
+  const [setStats, setSetStats] = useState([
+    {
+      highest_quiz_score: -1,
+      highest_audio_score: -1,
+      average_quiz_score: -1,
+      average_audio_score: -1,
+      email: 'Loading',
+    },
+  ]);
+  const [board, setBoard] = useState([
+    { email: '', level_total: -1, name: '' },
+  ]);
   const [cardHovered, setCardHovered] = useState<number>(0);
   const card1AnimationProps = useSpring({
     transform: cardHovered === 1 ? 'scale(1.15)' : 'scale(1)',
@@ -132,23 +141,21 @@ const Levels: React.FC<Props> = ({
   };
 
   const handleShowDialog = () => {
-
     setOpen(true);
-  }
+  };
 
   const handleHideDialog = () => {
- //   setCurrentRound(0)
+    //   setCurrentRound(0)
     setOpen(false);
-  }
+  };
   const handleShowBoardDialog = () => {
-
     setOpenBoard(true);
-  }
+  };
 
   const handleHideBoardDialog = () => {
- //   setCurrentRound(0)
+    //   setCurrentRound(0)
     setOpenBoard(false);
-  }
+  };
 
   const getLevels = () => {
     myConsole.log('Fetching levels');
@@ -170,10 +177,10 @@ const Levels: React.FC<Props> = ({
       });
   };
 
-  const getStats = (setId:number) => {
+  const getStats = (setId: number) => {
     Axios.get(`http://localhost:3000/api/getSetStats/${setId}`)
       .then((response) => {
-       handleShowDialog();
+        handleShowDialog();
 
         setSetStats(response.data);
         return myConsole.log(`Sets stats ${JSON.stringify(response.data)}`);
@@ -181,23 +188,19 @@ const Levels: React.FC<Props> = ({
       .catch((e) => {
         myConsole.log(e);
       });
-
-
-
   };
-  const getLeaderBoard = (levelId:number) => {
+  const getLeaderBoard = (levelId: number) => {
     Axios.get(`http://localhost:3000/api/getLevelLeaderboard/${levelId}`)
       .then((response) => {
         handleShowBoardDialog();
         setBoard(response.data);
-        return myConsole.log(`Level leaderboard ${JSON.stringify(response.data)}`);
+        return myConsole.log(
+          `Level leaderboard ${JSON.stringify(response.data)}`
+        );
       })
       .catch((e) => {
         myConsole.log(e);
       });
-
-
-
   };
 
   const getSets = (levelNo: number) => {
@@ -229,7 +232,6 @@ const Levels: React.FC<Props> = ({
     if (set === 'Set 2') return card2AnimationProps;
     return card3AnimationProps;
   };
-
 
   const renderCards = (lev) => {
     const cards = [
@@ -276,223 +278,304 @@ const Levels: React.FC<Props> = ({
   const classes = useStyles();
 
   if (!finalSet)
-  return (
-    <ThemeProvider theme={theme}>
-      <Dialog
-        open={open}
-   //     TransitionComponent={Transition}
-        keepMounted
-        onClose={handleHideDialog}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle id="alert-dialog-slide-title">Set Statistics</DialogTitle>
-        <DialogContent style={{backgroundColor: theme.palette.primary.dark,borderRadius:20,margin:'2%'}}>
-
-
-         <Grid container justify='space-between'>
-         <DialogContentText style={{color:'white',fontSize:14}}>
-         Highest Audio Round Score:
-          </DialogContentText>
-          <DialogContentText style={{color:'white',fontSize:14}}>
-         {setStats.stats[0].highest_audio_score}
-          </DialogContentText>
-         </Grid>
-         <Grid container justify='space-between'>
-         <DialogContentText style={{color:'white',fontSize:14}}>
-         Highest Quiz Round Score:
-          </DialogContentText>
-          <DialogContentText style={{color:'white',fontSize:14}}>
-         {setStats.stats[0].highest_quiz_score}
-          </DialogContentText>
-         </Grid>
-         <Grid container justify='space-between'>
-         <DialogContentText style={{color:'white',fontSize:14}}>
-         Average Audio Round Score:
-          </DialogContentText>
-          <DialogContentText style={{color:'white',fontSize:14}}>
-         {setStats.stats[0].average_audio_score}
-          </DialogContentText>
-          <Grid container justify='space-between'>
-         <DialogContentText style={{color:'white',fontSize:14}}>
-         Average Audio Round Score:
-          </DialogContentText>
-          <DialogContentText style={{color:'white',fontSize:14}}>
-         {setStats.stats[0].average_quiz_score}
-          </DialogContentText>
-         </Grid>
-         <Grid container justify='space-between'>
+    return (
+      <ThemeProvider theme={theme}>
+        <Dialog
+          open={open}
+          //     TransitionComponent={Transition}
+          keepMounted
+          onClose={handleHideDialog}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle id="alert-dialog-slide-title">
+            Set Statistics
+          </DialogTitle>
+          <DialogContent
+            style={{
+              backgroundColor: theme.palette.primary.dark,
+              borderRadius: 20,
+              margin: '2%',
+            }}
+          >
+            <Grid container justify="space-between">
+              <DialogContentText style={{ color: 'white', fontSize: 14 }}>
+                Highest Audio Round Score:
+              </DialogContentText>
+              <DialogContentText style={{ color: 'white', fontSize: 14 }}>
+                {setStats[0].highest_audio_score}
+              </DialogContentText>
+            </Grid>
+            <Grid container justify="space-between">
+              <DialogContentText style={{ color: 'white', fontSize: 14 }}>
+                Highest Quiz Round Score:
+              </DialogContentText>
+              <DialogContentText style={{ color: 'white', fontSize: 14 }}>
+                {setStats[0].highest_quiz_score}
+              </DialogContentText>
+            </Grid>
+            <Grid container justify="space-between">
+              <DialogContentText style={{ color: 'white', fontSize: 14 }}>
+                Average Audio Round Score:
+              </DialogContentText>
+              <DialogContentText style={{ color: 'white', fontSize: 14 }}>
+                {setStats[0].average_audio_score}
+              </DialogContentText>
+              <Grid container justify="space-between">
+                <DialogContentText style={{ color: 'white', fontSize: 14 }}>
+                  Average Audio Round Score:
+                </DialogContentText>
+                <DialogContentText style={{ color: 'white', fontSize: 14 }}>
+                  {setStats[0].average_quiz_score}
+                </DialogContentText>
+              </Grid>
+              {/* <Grid container justify='space-between'>
          <DialogContentText style={{color:'white',fontSize:14}}>
          Set Top Scorer Name
           </DialogContentText>
           <DialogContentText style={{color:'white',fontSize:14}}>
          {setStats.topper.length === 0? '-' : setStats.topper[0].name}
           </DialogContentText>
-         </Grid>
-         <Grid container justify='space-between'>
+         </Grid> */}
+              {/* <Grid container justify='space-between'>
          <DialogContentText style={{color:'white',fontSize:14}}>
          Topper's total
           </DialogContentText>
           <DialogContentText style={{color:'white',fontSize:14}}>
           {setStats.topper.length === 0? '-' : setStats.topper[0].total}
           </DialogContentText>
-         </Grid>
-         </Grid>
-        </DialogContent>
+         </Grid> */}
+            </Grid>
+          </DialogContent>
+        </Dialog>
 
-      </Dialog>
+        {/* for leaderboard */}
 
-      {/* for leaderboard */}
+        <Dialog
+          open={openBoard}
+          //     TransitionComponent={Transition}
+          keepMounted
+          onClose={handleHideBoardDialog}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle id="alert-dialog-slide-title">Leaderboard</DialogTitle>
+          <DialogContent
+            style={{
+              backgroundColor: theme.palette.primary.dark,
+              borderRadius: 20,
+              margin: '2%',
+            }}
+          >
+            {board.length === 0 ? (
+              <Grid>
+                <Typography style={{ fontSize: 14, color: 'white' }}>
+                  No competitors yet!
+                </Typography>
+              </Grid>
+            ) : (
+              <Grid container>
+                {board.map((row, inx) => {
+                  myConsole.log(JSON.stringify(`b ${board.length}`));
 
-      <Dialog
-        open={openBoard}
-   //     TransitionComponent={Transition}
-        keepMounted
-        onClose={handleHideBoardDialog}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle id="alert-dialog-slide-title">Leaderboard</DialogTitle>
-        <DialogContent style={{backgroundColor: theme.palette.primary.dark,borderRadius:20,margin:'2%'}}>
-      {board.map((row,inx) => {
-        myConsole.log(JSON.stringify("b "+board.length))
-        if(board.length === 0)
-        return <Grid>
-          <Typography>No competitors yet</Typography>
-        </Grid>
-        return(<Grid style={{backgroundColor:theme.palette.primary.dark,margin:'1%'}} container justify='space-between' key={inx.toString()}>
-          <Grid container justify='space-between' direction='row' style={{backgroundColor: theme.palette.primary.light,margin: '1%',padding:'1%',alignItems:'center',borderRadius:5,flex:1,width:300}}>
-          <DialogContentText style={{color:'white',fontSize:16,alignSelf:'center'}}>
-{`${(inx+1).toString()}. Level ${row.name}`}
-        </DialogContentText>
+                  return (
+                    <Grid
+                      style={{
+                        backgroundColor: theme.palette.primary.dark,
+                        margin: '1%',
+                      }}
+                      container
+                      justify="space-between"
+                      key={inx.toString()}
+                    >
+                      <Grid
+                        container
+                        justify="space-between"
+                        direction="row"
+                        style={{
+                          backgroundColor: theme.palette.primary.light,
+                          margin: '1%',
+                          padding: '1%',
+                          alignItems: 'center',
+                          borderRadius: 5,
+                          flex: 1,
+                          width: 300,
+                        }}
+                      >
+                        <DialogContentText
+                          style={{
+                            color: 'white',
+                            fontSize: 16,
+                            alignSelf: 'center',
+                          }}
+                        >
+                          {`${(inx + 1).toString()}. Level ${row.name}`}
+                        </DialogContentText>
 
-        <DialogContentText style={{color:'white',fontSize:16,alignSelf: 'center'}}>
-{`${row.level_total}`}
-        </DialogContentText>
-
-          </Grid>
-
-        </Grid>
-        )
-      })}
-        </DialogContent>
-
-      </Dialog>
-      <Grid container style={{ flex: 1, alignSelf: 'flex-start',marginTop:'5%' }}>
-        <ArrowBackIcon
-          onClick={() => {
-            setInstructorChosen(0);
-          }}
-          style={{ margin: '2%' }}
-        />
+                        <DialogContentText
+                          style={{
+                            color: 'white',
+                            fontSize: 16,
+                            alignSelf: 'center',
+                          }}
+                        >
+                          {`${row.level_total}`}
+                        </DialogContentText>
+                      </Grid>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            )}
+          </DialogContent>
+        </Dialog>
         <Grid
           container
-          direction="column"
-          style={{ flex: 1, justifyContent: 'center' }}
+          style={{ flex: 1, alignSelf: 'flex-start', marginTop: '5%' }}
         >
-        </Grid>
+          <ArrowBackIcon
+            onClick={() => {
+              setInstructorChosen(0);
+            }}
+            style={{ margin: '2%' }}
+          />
+          <Grid
+            container
+            direction="column"
+            style={{ flex: 1, justifyContent: 'center' }}
+          />
 
-        <Grid container style={{marginTop:'3%'}}>
-          {levelsFetched.map((lev, inx) => (
-            <Box
-              key={inx.toString()}
-              style={{cursor:'pointer'}}
-              border={6}
-              borderRadius={26}
-              borderColor={lev.id ? theme.palette.primary.dark : 'transparent'}
-            >
-              <Grid
-                container
-                onClick={() => {
-                  for (const i in levelsFetched) {
-                    levelsFetched[i].id = false;
-                  }
-                  lev.id = !lev.id;
-                  //   getSets(lev.level_no);
-                  setRandomData(Math.random());
-                }}
-                className={classes.level}
+          <Grid container style={{ marginTop: '3%' }}>
+            {levelsFetched.map((lev, inx) => (
+              <Box
+                key={inx.toString()}
+                style={{ cursor: 'pointer' }}
+                border={6}
+                borderRadius={26}
+                borderColor={
+                  lev.id ? theme.palette.primary.dark : 'transparent'
+                }
               >
-                <Typography
-                  style={{ marginTop: lev.id ? 5 : 80 }}
-                  className={classes.text}
-                >
-                  {lev.level_name}
-                </Typography>
                 <Grid
-                  style={{ opacity: lev.id ? 1 : 0 }}
-                  className={classes.set}
                   container
+                  onClick={() => {
+                    for (const i in levelsFetched) {
+                      levelsFetched[i].id = false;
+                    }
+                    lev.id = !lev.id;
+                    //   getSets(lev.level_no);
+                    setRandomData(Math.random());
+                  }}
+                  className={classes.level}
                 >
-                  {renderCards(lev)}
-                  {/* <Grid container>
+                  <Typography
+                    style={{ marginTop: lev.id ? 5 : 80 }}
+                    className={classes.text}
+                  >
+                    {lev.level_name}
+                  </Typography>
+                  <Grid
+                    style={{ opacity: lev.id ? 1 : 0 }}
+                    className={classes.set}
+                    container
+                  >
+                    {renderCards(lev)}
+                    {/* <Grid container>
                   <Typography>
 
                   </Typography>
 
                 </Grid> */}
-                </Grid>
-              </Grid>
-            </Box>
-          ))}
-
-          <Grid container>
-            <Grid
-              container
-              direction="column"
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-            </Grid>
-            {sets.map((set, inx) => {
-              return (
-                <Grid direction='row' style={{backgroundColor:theme.palette.primary.dark,borderRadius:10,margin:'1%'}} container key={inx.toString()}
-                >
-                <Grid
-                  justify="space-between"
-                  style={{flex:7}}
-                  className={classes.oneSet}
-                  onClick={() => {
-                    myConsole.log('Quiz');
-                  //  goToPlay(set.set_id);
-                     setFinalSet(set.set_id);
-
-                  }}
-                  container
-                >
-                  <Typography>{`${set.set_name}`}</Typography>
-
-                  <Typography>{`Number of words: ${set.number_of_words}`}</Typography>
-                </Grid>
-                <Grid container style={{flex:1,alignItems: 'center',justifyContent: 'flex-end',margin:'1%'}}>
-                <Button
-
-                  onClick={() => {
-                    getStats(set.set_id);
-
-                  }}
-                  variant='contained'
-                  style= {{backgroundColor: theme.palette.primary.light,color:'white',alignItems:'center'}}
-                  >
-                    View Stats
-                  </Button>
                   </Grid>
-
                 </Grid>
-              );
-            })}
+              </Box>
+            ))}
+
+            <Grid container>
+              <Grid
+                container
+                direction="column"
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              />
+              {sets.length === 0 ? (
+                <Grid style={{width:window.innerWidth,alignItems:'center',justifyContent:'center',marginTop:'2%'}}>
+                  <Typography style={{ color: 'white', fontSize: 20,margin:'2%' }}>
+                    No sets added yet!
+                  </Typography>
+                </Grid>
+              ) : (
+                <Grid container>
+                  {sets.map((set, inx) => {
+                    return (
+                      <Grid
+                        direction="row"
+                        style={{
+                          backgroundColor: theme.palette.primary.dark,
+                          borderRadius: 10,
+                          margin: '1%',
+                        }}
+                        container
+                        key={inx.toString()}
+                      >
+                        <Grid
+                          justify="space-between"
+                          style={{ flex: 7 }}
+                          className={classes.oneSet}
+                          onClick={() => {
+                            myConsole.log('Quiz');
+                            //  goToPlay(set.set_id);
+                            setFinalSet(set.set_id);
+                          }}
+                          container
+                        >
+                          <Typography>{`${set.set_name}`}</Typography>
+
+                          <Typography>{`Number of words: ${set.number_of_words}`}</Typography>
+                        </Grid>
+                        <Grid
+                          container
+                          style={{
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            margin: '1%',
+                          }}
+                        >
+                          <Button
+                            onClick={() => {
+                              getStats(set.set_id);
+                            }}
+                            variant="contained"
+                            style={{
+                              backgroundColor: theme.palette.primary.light,
+                              color: 'white',
+                              alignItems: 'center',
+                            }}
+                          >
+                            View Stats
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              )}
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-    </ThemeProvider>
+      </ThemeProvider>
+    );
+  return (
+    <Rounds
+      instructorEmail={instructorEmail}
+      setFinalSet={setFinalSet}
+      finalSet={finalSet}
+    />
   );
-  return <Rounds instructorEmail={instructorEmail} setFinalSet={setFinalSet} finalSet={finalSet} />
-
 };
-
-
 
 export default Levels;

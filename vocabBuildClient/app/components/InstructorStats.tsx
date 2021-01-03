@@ -126,6 +126,7 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
 
 
   const fetchStats = () => {
+    myConsole.log('Tut email '+ tutorEmail)
     Axios.get(`http://localhost:3000/api/getTutorStats/${tutorEmail}`)
       .then((response) => {
 
@@ -156,12 +157,14 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
          mark: setStat[i].best_score_audio + setStat[i].best_score_quiz,
          total: setStat[i].total
        }
+       myConsole.log("item "+JSON.stringify(obj))
        content.push(obj);
 
     }
     const genRanHex = (size:number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
 
     return(content.map((bar,inx) => {
+      if(bar.name !== null && bar.name !== undefined && bar.mark !== null && bar.mark !== undefined)
       return(<Grid direction='row' style={{width:500,height:100,padding:0,paddingTop:'5%',paddingBottom:'5%',margin:'1%',backgroundColor:'white'}} key={inx.toString()} container>
         <Grid container
         style={{width:(bar.mark/5)*100,height:40,backgroundColor:`#${genRanHex(6)}`}}
@@ -172,6 +175,7 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
 
          </Grid>
       </Grid>)
+      return null;
     }));
 
   }

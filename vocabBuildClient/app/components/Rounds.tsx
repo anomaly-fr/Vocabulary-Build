@@ -103,7 +103,7 @@ const Rounds: React.FC<Props> = ({ setFinalSet,finalSet,instructorEmail,userEmai
   return (
     <ThemeProvider theme={theme}>
       <Grid container className={classes.container}>
-        <Grid container style={{ margin: '1%' }}>
+        <Grid container style={{ margin: '5%' }}>
           <ArrowBackIcon onClick={() => setFinalSet(0)} />
         </Grid>
 

@@ -152,11 +152,12 @@ useEffect(() => {
 
 },[]);
 const updateScore = () => {
-  myConsole.log(`Mail ${window.localStorage.getItem('email')}`)
+   myConsole.log("Email "+ JSON.parse(window.localStorage.getItem('email')));
+
   Axios.post(`http://localhost:3000/api/updateBestScore/audio`,{
 
 
-    email: 'a',       //window.localStorage.getItem('email'),
+    email: JSON.parse(window.localStorage.getItem('email')),
     set_id : setId,
     best_score_audio : score
 
@@ -213,7 +214,7 @@ const updateScore = () => {
           </Button> */}
         </DialogActions>
       </Dialog>
- <Grid container style={{ margin: '1%',alignItems: 'center' }}>
+ <Grid container style={{ margin: '5%',alignItems: 'center' }}>
 
           <ArrowBackIcon
           onClick={() => {

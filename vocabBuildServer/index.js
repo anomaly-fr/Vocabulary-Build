@@ -336,19 +336,19 @@ app.get("/api/getSetStats/:set_id", (req, res) => {
         console.log("Result " + JSON.stringify(result1));
         console.log("Error " + error1);
 
-        db.query(sqlQuery2, (error2, result2) => {
-            console.log("Result " + result2);
-            console.log("Error " + error2);
+        // db.query(sqlQuery2, (error2, result2) => {
+        //     console.log("Result " + result2);
+        //     console.log("Error " + error2);
 
-           const response = {
-               stats : result1,
-               topper : result2
-           }
+        //    const response = {
+        //        stats : result1,
+        //        topper : result2
+        //    }
     
-           console.log(":) "+JSON.stringify(response));
-           res.json(response);
+        //    console.log(":) "+JSON.stringify(response));
+           res.json(result1);
     
-        });
+       // });
 
 
     });
@@ -372,7 +372,7 @@ app.get("/api/getLevelLeaderboard/:level_id", (req, res) => {
 
 // Get tutor stats
 app.get("/api/getTutorStats/:tutor_email", (req, res) => {
-    const sqlSelect = "select tutor_email,level_id,level_name,set_id,set_name,max(best_score_quiz) as highest_quiz_score,avg(best_score_quiz) as average_quiz_score,max(best_score_audio) as highest_audio_score,avg(best_score_audio) as average_quiz_score,avg(best_score_audio) as average_audio_score,max(total) as best_total,avg(total) as average_total from full_tutor_analysis where tutor_email='ak'  group by set_id ORDER BY level_name;"
+    const sqlSelect = "select tutor_email,level_id,level_name,set_id,set_name,max(best_score_quiz) as highest_quiz_score,avg(best_score_quiz) as average_quiz_score,max(best_score_audio) as highest_audio_score,avg(best_score_audio) as average_quiz_score,avg(best_score_audio) as average_audio_score,max(total) as best_total,avg(total) as average_total from full_tutor_analysis where tutor_email=?  group by set_id ORDER BY level_name;"
     // const sqlSelect = "SELECT TUTOR_email,level_id,level_name,set_id,set_name,MAX(best_score_quiz) AS highest_quiz_score,AVG(best_score_quiz) AS average_quiz_score, MAX(best_score_audio) as highest_audio_score,AVG(best_score_quiz) AS average_quiz_score,MAX(total) AS best_total,AVG(total) AS average_total FROM full_tutor_analysis WHERE tutor_email=? GROUP BY set_id ORDER BY level_name;";
     const tutorEmail = req.params.tutor_email;
     db.query(sqlSelect, [tutorEmail], (error, result) => {

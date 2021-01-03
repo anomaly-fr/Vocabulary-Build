@@ -143,7 +143,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
     Axios.post(`http://localhost:3000/api/updateBestScore/quiz`,{
 
 
-      email: window.localStorage.getItem('email'),
+      email: JSON.parse(window.localStorage.getItem('email')),
       set_id : setId,
       best_score_quiz : score
 
@@ -179,7 +179,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
           setCurrentRound(0);
 
         }}
-        item style={{marginLeft: '5%',flex:1}}>
+        item style={{margin: '5%',flex:1}}>
         <ArrowBackIcon />
 
         </Grid>
@@ -249,7 +249,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         myConsole.log('Correct');
                         setScore(score+1);
                         setColours([
-                          'green',
+                          'lightgreen',
                           'transparent',
                           'transparent',
                           'transparent',
@@ -272,7 +272,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         if (ans == 1)
                           setColours([
                             'red',
-                            'green',
+                            'lightgreen',
                             'transparent',
                             'transparent',
                           ]);
@@ -280,7 +280,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                           setColours([
                             'red',
                             'transparent',
-                            'green',
+                            'lightgreen',
                             'transparent',
                           ]);
                         else
@@ -288,7 +288,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                             'red',
                             'transparent',
                             'transparent',
-                            'green',
+                            'lightgreen',
                           ]);
                       }
                       setAnswered(true);
@@ -313,7 +313,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
 
                         setColours([
                           'transparent',
-                          'green',
+                          'lightgreen',
                           'transparent',
                           'transparent',
                         ]);
@@ -336,7 +336,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         }
                         if (ans == 0)
                           setColours([
-                            'green',
+                            'lightgreen',
                             'red',
                             'transparent',
                             'transparent',
@@ -345,7 +345,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                           setColours([
                             'transparent',
                             'red',
-                            'green',
+                            'lightgreen',
                             'transparent',
                           ]);
                         else
@@ -353,7 +353,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                             'transparent',
                             'red',
                             'transparent',
-                            'green',
+                            'lightgreen',
                           ]);
                       }
                       setAnswered(true);
@@ -382,7 +382,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         setColours([
                           'transparent',
                           'transparent',
-                          'green',
+                          'lightgreen',
                           'transparent',
                         ]);
                       } else {
@@ -404,7 +404,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         }
                         if (ans == 0)
                           setColours([
-                            'green',
+                            'lightgreen',
                             'transparent',
                             'red',
                             'transparent',
@@ -412,7 +412,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         else if (ans == 1)
                           setColours([
                             'transparent',
-                            'green',
+                            'lightgreen',
                             'red',
                             'transparent',
                           ]);
@@ -421,7 +421,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                             'transparent',
                             'transparent',
                             'red',
-                            'green',
+                            'lightgreen',
                           ]);
                       }
                       setAnswered(true);
@@ -452,7 +452,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                           'transparent',
                           'transparent',
                           'transparent',
-                          'green',
+                          'lightgreen',
                         ]);
                       } else {
                         myConsole.log("quiz[questionNumber].options[3] " + quiz[questionNumber].options[3]);
@@ -474,7 +474,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         }
                         if (ans == 0)
                           setColours([
-                            'green',
+                            'lightgreen',
                             'transparent',
                             'transparent',
                             'red',
@@ -482,7 +482,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         else if (ans == 1)
                           setColours([
                             'transparent',
-                            'green',
+                            'lightgreen',
                             'transparent',
                             'red',
                           ]);
@@ -490,7 +490,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                           setColours([
                             'transparent',
                             'transparent',
-                            'green',
+                            'lightgreen',
                             'red',
                           ]);
                       }

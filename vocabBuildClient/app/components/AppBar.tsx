@@ -94,9 +94,10 @@ interface Props {
   logout?: () => void;
   email?: string;
   leaderboard?: (b: boolean) => void;
+  userType?: string;
 }
 
-const TopBar: React.FC<Props> = ({ name, logout, leaderboard }) => {
+const TopBar: React.FC<Props> = ({ name, logout, userType }) => {
   // myConsole.log(JSON.stringify(levelNo))
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const history = useHistory();
@@ -139,17 +140,17 @@ const TopBar: React.FC<Props> = ({ name, logout, leaderboard }) => {
         setDefinitions(response.data.definitions);
         isWordSearchActive(true);
         return myConsole.log(response.data);
-
       })
       .catch((e) => {});
   };
 
   const markLookUp = () => {
+    'email ' + JSON.parse(window.localStorage.getItem('email'));
+
     Axios.put('http://localhost:3000/api/markLookUp', {
-      user_email: window.localStorage.getItem('email'),
+      user_email: JSON.parse(window.localStorage.getItem('email')),
     })
       .then((response) => {
-        myConsole.log("email " +window.localStorage.getItem('email'));
         isWordSearchActive(false);
         setSearchTerm('');
         return myConsole.log(response.data);
@@ -216,6 +217,7 @@ const TopBar: React.FC<Props> = ({ name, logout, leaderboard }) => {
                   onChange={(word) => setSearchTerm(word)}
                   onRequestSearch={() => {
                     if (searchTerm !== '') wordSearch();
+
                   }}
                 />
                 {/* <TextField
@@ -247,7 +249,7 @@ style={{padding: '1%'}}
                   showLB(true);
                 }}
               >
-                Leader Board
+                Leaderboard
               </Typography>
             </Grid>
           </AppBar>
@@ -267,26 +269,38 @@ style={{padding: '1%'}}
               style={{ padding: '3%', marginTop: '3%' }}
               container
             >
-              <Typography
-                style={{ color: 'gray', fontWeight: 'lighter', fontSize: 18 }}
-              >
-                {searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1)}
-              </Typography>
-              {definitions.map((definition, inx) => {
-                return (
-                  <Grid key={inx.toString()} container>
-                    <Typography>{`${(inx + 1).toString()}. ${
-                      definition.definition.charAt(0).toUpperCase() +
-                      definition.definition.slice(1)
-                    }`}</Typography>
-                  </Grid>
-                );
-              })}
-              <ExpandLessIcon
-                style={{ cursor: 'pointer' }}
-                onMouseEnter={() => setHover(false)}
-                onClick={() => markLookUp()}
-              />
+              <Card style={{ padding: '3%' }}>
+                <Typography
+                  style={{ color: 'gray', fontWeight: 'lighter', fontSize: 18 }}
+                >
+                  {searchTerm.charAt(0).toUpperCase() + searchTerm.slice(1)}
+                </Typography>
+                {definitions.map((definition, inx) => {
+                  return (
+                    <Grid key={inx.toString()} container>
+                      <Typography>{`${(inx + 1).toString()}. ${
+                        definition.definition.charAt(0).toUpperCase() +
+                        definition.definition.slice(1)
+                      }`}</Typography>
+                    </Grid>
+                  );
+                })}
+              </Card>
+              <Grid container style={{ margin: '2%' }}>
+                <ExpandLessIcon
+                  style={{ cursor: 'pointer' }}
+                  onMouseEnter={() => setHover(false)}
+                  onClick={() => {
+                    //  myConsole.log(userType);
+                    if (window.localStorage.getItem('userType') === 'tutee')
+                      markLookUp();
+                      else {
+                        isWordSearchActive(false);
+                        setSearchTerm('');
+                      }
+                  }}
+                />
+              </Grid>
             </Grid>
           </Collapse>
         </Card>
