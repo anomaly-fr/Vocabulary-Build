@@ -86,6 +86,8 @@ const Login: React.FC<Props> = () => {
         if (response.data[0].password !== password) {
           setMessage('Password incorrect');
         } else {
+          window.localStorage.setItem("email", JSON.stringify(response.data[0].email));
+          window.localStorage.setItem("userType", "tutee");
           history.push({
             pathname: '/home',
             state: {

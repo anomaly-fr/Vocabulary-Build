@@ -1,174 +1,286 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-nested-ternary */
-import React,{ useState } from 'react';
 import {
-  Grid,
-  makeStyles,
-  ThemeProvider,
-  Typography,
-  Button,
-  InputBase,
-  TextField
-} from '@material-ui/core';
-import VolumeUpIcon from '@material-ui/icons/VolumeUp';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import { useSpeechSynthesis } from 'react-speech-kit';
-import { Link } from 'react-router-dom';
-import { Theme } from '../constants/theme';
-import { myConsole } from '../constants/constants';
+  app,
+  Menu,
+  shell,
+  BrowserWindow,
+  MenuItemConstructorOptions,
+} from 'electron';
 
-
-const theme=Theme;
-const useStyles = makeStyles({
-  container: {
-    width: '100%',
-    height: window.innerHeight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation:1,
-    backgroundColor: 'cyan'
-  },
-  card: {
-    borderRadius: 25,
-    elevation: 1,
-    width: window.innerWidth * 0.85,
-  //  height: 500,
-    padding: '1%',
-    alignSelf: 'center',
-flexDirection: 'row',
-backgroundColor: 'gray'
-  },
-  button: {
-    width: window.innerWidth / 4.5,
-    // alignSelf: 'center',
-    marginTop: '5vh',
-  },
-  triangle: {
-    width: 0,
-  //  height: 0,
-    backgroundColor: 'transparent',
-    borderStyle: 'solid',
-    borderTopWidth: 0,
-    borderRightWidth: 200,
-    borderBottomWidth: 90,
-    borderLeftWidth: 0,
-    borderTopColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: theme.palette.primary.dark,
-    borderLeftColor: 'transparent',
-  },
-  questionNumber : {
-    color :'white',
-    backgroundColor: 'pink',
-
-  },
-  circle: {
-    width: 60,
-    height :60,
-    borderRadius: 30,
-    backgroundColor: theme.palette.primary.dark,
-    alignItems:'center',
-    justifyContent:'center'
-
-  }
-});
-
-interface Props {
-  // setRound = (round : number) => void
+interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
+  selector?: string;
+  submenu?: DarwinMenuItemConstructorOptions[] | Menu;
 }
 
-const words = ["Access","Repository","Enhance","Mystical"];
+export default class MenuBuilder {
+  mainWindow: BrowserWindow;
 
+  constructor(mainWindow: BrowserWindow) {
+    this.mainWindow = mainWindow;
+  }
 
+  buildMenu(): Menu {
+    if (
+      process.env.NODE_ENV === 'development' ||
+      process.env.DEBUG_PROD === 'true'
+    ) {
+      this.setupDevelopmentEnvironment();
+    }
 
-const AudioCard: React.FC<Props> = () => {
-  const [spelling,setSpelling] = useState('')
-  const [questionNumber,setQuestionNumber] = useState<number>(1);
-  const { speak,voices,pitch,rate } = useSpeechSynthesis();
-  const classes = useStyles();
-  // myConsole.log(voices.length)
-  return(<ThemeProvider theme={theme}>
+    const template =
+      process.platform === 'darwin'
+        ? this.buildDarwinTemplate()
+        : this.buildDefaultTemplate();
 
- <Grid direction='row' container style={{ margin: '1%' }}>
-   <Link to="/home" style={{textDecoration:"none"}}>
-   <Typography onClick={() => setRound(0)} style={{ color: 'white' }}>
-            Back
-          </Typography>
-   </Link>
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
 
-        </Grid>
+    return menu;
+  }
 
+  setupDevelopmentEnvironment(): void {
+    this.mainWindow.webContents.on('context-menu', (_, props) => {
+      const { x, y } = props;
 
-  <Grid container className={classes.container}>
-    <Grid container direction='row' className={classes.card}>
+      // Menu.buildFromTemplate([
+      //   {
+      //     label: 'Inspect element',
+      //     click: () => {
+      //       this.mainWindow.webContents.inspectElement(x, y);
+      //     },
+      //   },
+      // ]).popup({ window: this.mainWindow });
+    });
+  }
 
-      <Grid item className={classes.triangle} />
+  buildDarwinTemplate(): MenuItemConstructorOptions[] {
+    const subMenuAbout: DarwinMenuItemConstructorOptions = {
+      label: 'Electron',
+      submenu: [
+        {
+          label: 'About ElectronReact',
+          selector: 'orderFrontStandardAboutPanel:',
+        },
+        { type: 'separator' },
+        { label: 'Services', submenu: [] },
+        { type: 'separator' },
+        {
+          label: 'Hide ElectronReact',
+          accelerator: 'Command+H',
+          selector: 'hide:',
+        },
+        {
+          label: 'Hide Others',
+          accelerator: 'Command+Shift+H',
+          selector: 'hideOtherApplications:',
+        },
+        { label: 'Show All', selector: 'unhideAllApplications:' },
+        { type: 'separator' },
+        {
+          label: 'Quit',
+          accelerator: 'Command+Q',
+          click: () => {
+            app.quit();
+          },
+        },
+      ],
+    };
+    const subMenuEdit: DarwinMenuItemConstructorOptions = {
+      label: 'Edit',
+      submenu: [
+        { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
+        { label: 'Redo', accelerator: 'Shift+Command+Z', selector: 'redo:' },
+        { type: 'separator' },
+        { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
+        { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
+        { label: 'Paste', accelerator: 'Command+V', selector: 'paste:' },
+        {
+          label: 'Select All',
+          accelerator: 'Command+A',
+          selector: 'selectAll:',
+        },
+      ],
+    };
+    const subMenuViewDev: MenuItemConstructorOptions = {
+      label: 'View',
+      submenu: [
+        {
+          label: 'Reload',
+          accelerator: 'Command+R',
+          click: () => {
+            this.mainWindow.webContents.reload();
+          },
+        },
+        {
+          label: 'Toggle Full Screen',
+          accelerator: 'Ctrl+Command+F',
+          click: () => {
+            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
+          },
+        },
+        {
+          label: 'Toggle Developer Tools',
+          accelerator: 'Alt+Command+I',
+          click: () => {
+            this.mainWindow.webContents.toggleDevTools();
+          },
+        },
+      ],
+    };
+    const subMenuViewProd: MenuItemConstructorOptions = {
+      label: 'View',
+      submenu: [
+        {
+          label: 'Toggle Full Screen',
+          accelerator: 'Ctrl+Command+F',
+          click: () => {
+            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
+          },
+        },
+      ],
+    };
+    const subMenuWindow: DarwinMenuItemConstructorOptions = {
+      label: 'Window',
+      submenu: [
+        {
+          label: 'Minimize',
+          accelerator: 'Command+M',
+          selector: 'performMiniaturize:',
+        },
+        { label: 'Close', accelerator: 'Command+W', selector: 'performClose:' },
+        { type: 'separator' },
+        { label: 'Bring All to Front', selector: 'arrangeInFront:' },
+      ],
+    };
+    const subMenuHelp: MenuItemConstructorOptions = {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'Learn More',
+          click() {
+            shell.openExternal('https://electronjs.org');
+          },
+        },
+        {
+          label: 'Documentation',
+          click() {
+            shell.openExternal(
+              'https://github.com/electron/electron/tree/master/docs#readme'
+            );
+          },
+        },
+        {
+          label: 'Community Discussions',
+          click() {
+            shell.openExternal('https://www.electronjs.org/community');
+          },
+        },
+        {
+          label: 'Search Issues',
+          click() {
+            shell.openExternal('https://github.com/electron/electron/issues');
+          },
+        },
+      ],
+    };
 
-     <Grid container direction="column" style={{flexDirection: 'column',alignItems: 'center',justifyContent: 'center'}}>
-       <Grid container direction='row' style={{alignItems: 'center',alignSelf: 'center',justifyContent: 'center',padding: '2%'}}>
-       <Typography style={{color: theme.palette.primary.light}}>{`${questionNumber}.`}</Typography>
+    const subMenuView = subMenuViewProd;
 
-       <VolumeUpIcon onClick={() => {
-         speak({ text:`Spell`,rate:0.5,voice: voices[1] })
-         speak({ text: words[questionNumber-1],rate:1,voice: voices[1]})
-         }} style={{color: theme.palette.primary.light}} fontSize="large"/>
-       <Grid direction='column'>
-       <Typography  style={{color: theme.palette.primary.light}}>Click to play sound</Typography>
+    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+  }
 
-       </Grid>
+  buildDefaultTemplate() {
+    const templateDefault = [
+      {
+        label: '&File',
+        submenu: [
+          {
+            label: '&Open',
+            accelerator: 'Ctrl+O',
+          },
+          {
+            label: '&Close',
+            accelerator: 'Ctrl+W',
+            click: () => {
+              this.mainWindow.close();
+            },
+          },
+        ],
+      },
+      {
+        label: '&View',
+        submenu:
+          process.env.NODE_ENV === 'development' ||
+          process.env.DEBUG_PROD === 'true'
+            ? [
+                {
+                  label: '&Reload',
+                  accelerator: 'Ctrl+R',
+                  click: () => {
+                    this.mainWindow.webContents.reload();
+                  },
+                },
+                {
+                  label: 'Toggle &Full Screen',
+                  accelerator: 'F11',
+                  click: () => {
+                    this.mainWindow.setFullScreen(
+                      !this.mainWindow.isFullScreen()
+                    );
+                  },
+                },
+                {
+                  label: 'Toggle &Developer Tools',
+                  accelerator: 'Alt+Ctrl+I',
+                  click: () => {
+                    this.mainWindow.webContents.toggleDevTools();
+                  },
+                },
+              ]
+            : [
+                {
+                  label: 'Toggle &Full Screen',
+                  accelerator: 'F11',
+                  click: () => {
+                    this.mainWindow.setFullScreen(
+                      !this.mainWindow.isFullScreen()
+                    );
+                  },
+                },
+              ],
+      },
+      {
+        label: 'Help',
+        submenu: [
+          {
+            label: 'Learn More',
+            click() {
+              shell.openExternal('https://electronjs.org');
+            },
+          },
+          {
+            label: 'Documentation',
+            click() {
+              shell.openExternal(
+                'https://github.com/electron/electron/tree/master/docs#readme'
+              );
+            },
+          },
+          {
+            label: 'Community Discussions',
+            click() {
+              shell.openExternal('https://www.electronjs.org/community');
+            },
+          },
+          {
+            label: 'Search Issues',
+            click() {
+              shell.openExternal('https://github.com/electron/electron/issues');
+            },
+          },
+        ],
+      },
+    ];
 
-
-       </Grid>
-       <TextField
-       onChange={(value) => setSpelling(value.target.value)}
-
-     style={{width: '50%'}}
-     variant='outlined'
-
-     />
-     <Grid container direction="row" style={{backgroundColor: 'yellow',alignItems: 'center',justifyContent: 'center'}}>
-     <Button
-                          type="submit"
-                        //  fullWidth
-                          variant="contained"
-                          color="primary"
-                          style={{width:'50%',marginTop: 10}}
-                     //     className={classes.submit}
-                        >
-                        Check
-                        </Button>
-
-     </Grid>
-
-
-
-     </Grid>
-
-
-
-     <Grid container style={{alignItems: 'center',justifyContent: 'space-between',backgroundColor: 'pink'}}>
-       <Grid container className={classes.circle}>
-       <ArrowForwardIcon onClick={() => setQuestionNumber(questionNumber+1)} style={{color: 'white',height: 20,width:20,alignSelf: 'center'}} />
-
-       </Grid>
-       <Grid style={{backgroundColor: 'green'}}>
-         xwn
-       </Grid>
-<CheckCircleOutlineIcon style={{color: 'white',height: 20,width:20,alignSelf: 'center'}} />
-
-     </Grid>
-
-     </Grid>
-
-
-
-
-
-
-  </Grid>
-  </ThemeProvider>)
-
-};
-
-export default AudioCard;
+    return templateDefault;
+  }
+}

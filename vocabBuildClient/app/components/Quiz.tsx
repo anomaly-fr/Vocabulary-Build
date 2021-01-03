@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 import React, { useEffect, useState } from 'react';
@@ -62,20 +61,20 @@ const useStyles = makeStyles({
 
 interface Props {
   setId: number;
-  setCurrentRound : (round : number) => void;
-  userEmail : string;
+  setCurrentRound: (round: number) => void;
+  userEmail: string;
 }
 
-const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
-  myConsole.log(`Email is ${userEmail}`)
+const Quiz: React.FC<Props> = ({ setId, setCurrentRound, userEmail }) => {
+  myConsole.log(`Email is ${JSON.parse(localStorage.getItem('email'))}`);
   const [quiz, setQuiz] = useState([]);
   const [oneEnter, setOneEnter] = useState<boolean>(false);
   const [quizLoaded, setQuizLoaded] = useState<boolean>(false);
   const [questionNumber, setQuestionNumber] = useState<number>(0);
   const [answered, setAnswered] = useState<boolean>(false);
-  const [open,setOpen] = useState<boolean>(false);
-  const [bestScore,setBestScore] = useState<number>(0);
-
+  const [open, setOpen] = useState<boolean>(false);
+  const [bestScore, setBestScore] = useState<number>(0);
+  const [numberOfWords, setNumberOfWords] = useState<number>(0);
 
   const [colours, setColours] = useState([
     'transparent',
@@ -84,10 +83,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
     'transparent',
   ]);
 
-
-
-
-  const [score,setScore] = useState<number>(0);
+  const [score, setScore] = useState<number>(0);
   const shuffleOptions = (array) => {
     let i = array.length - 1;
     for (; i > 0; i -= 1) {
@@ -102,8 +98,8 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
   const fetchWords = () => {
     Axios.get(`http://localhost:3000/api/getWordsBySetId/${setId}`)
       .then((response) => {
-        let temp = response.data;
-        for (let i in temp) {
+        const temp = response.data;
+        for (const i in temp) {
           let options = [];
           options.push(temp[i].word_correct_def);
           options.push(temp[i].word_incorrect_1);
@@ -116,7 +112,19 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
             ...temp[i],
             options,
           };
+          myConsole.log(`Temp ${JSON.stringify(temp[i])}`);
         }
+
+        Axios.get(`http://localhost:3000/api/getNumberOfWordsBySetId/${setId}`)
+          .then((res) => {
+            myConsole.log(`Number ${JSON.stringify(res.data)}`);
+            setNumberOfWords(res.data[0].number_of_words);
+
+            myConsole.log(setId);
+          })
+          .catch((e) => {
+          });
+
         setQuiz(temp);
         setQuizLoaded(true);
         return myConsole.log(response.data);
@@ -130,83 +138,81 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
     fetchWords();
   }, [setId]);
   const handleShowDialog = () => {
-
     setOpen(true);
-  }
+  };
 
   const handleHideDialog = () => {
-    setCurrentRound(0)
+    setCurrentRound(0);
     setOpen(false);
-  }
+  };
 
   const updateScore = () => {
-    Axios.post(`http://localhost:3000/api/updateBestScore/quiz`,{
-
-
+    Axios.post(`http://localhost:3000/api/updateBestScore/quiz`, {
       email: JSON.parse(window.localStorage.getItem('email')),
-      set_id : setId,
-      best_score_quiz : score
-
-
+      set_id: setId,
+      best_score_quiz: score,
     })
-    .then((response) => {
-      myConsole.log("result "+JSON.stringify(response.data));
-      setBestScore(response.data[0].best_score_quiz);
-      handleShowDialog();
+      .then((response) => {
+        myConsole.log(`result ${JSON.stringify(response.data)}`);
+        setBestScore(response.data[0].best_score_quiz);
+        handleShowDialog();
 
-      return myConsole.log(JSON.stringify(response.data));
-    })
-    .catch((e) => {
-      myConsole.log(e);
-    });
-
-  }
+        return myConsole.log(JSON.stringify(response.data));
+      })
+      .catch((e) => {
+        myConsole.log(e);
+      });
+  };
 
   const nextQuestion = () => {
+    myConsole.log(`Length ${numberOfWords}`);
     setAnswered(false);
-    if (questionNumber + 1 !== quiz.length) {
+    if (questionNumber + 1 !== numberOfWords) {
       setColours(['transparent', 'transparent', 'transparent', 'transparent']);
       setQuestionNumber(questionNumber + 1);
     } else {
-       updateScore();
+      updateScore();
     }
   };
   const classes = useStyles();
   return (
     <ThemeProvider theme={theme}>
       <Grid container>
-        <Grid onClick={() => {
-          setCurrentRound(0);
-
-        }}
-        item style={{margin: '5%',flex:1}}>
-        <ArrowBackIcon />
-
-        </Grid>
-      <Dialog
-        open={open}
-   //     TransitionComponent={Transition}
-        keepMounted
-        onClose={handleHideDialog}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle id="alert-dialog-slide-title">{"Quiz Completed!"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-  {`You scored ${score}/${quiz.length}! Your best score for this set is ${bestScore}`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
+        <Grid
           onClick={() => {
-            handleHideDialog();
-
-            }}
-            color="primary">
-            Okay
-          </Button>
-          {/* <Button
+            setCurrentRound(0);
+          }}
+          item
+          style={{ margin: '5%', flex: 1 }}
+        >
+          <ArrowBackIcon />
+        </Grid>
+        <Dialog
+          open={open}
+          //     TransitionComponent={Transition}
+          keepMounted
+          onClose={handleHideDialog}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle id="alert-dialog-slide-title">
+            Quiz Completed!
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-slide-description">
+              {`You scored ${score}/${numberOfWords}! Your best score for this set is ${bestScore}`}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                handleHideDialog();
+              }}
+              color="primary"
+            >
+              Okay
+            </Button>
+            {/* <Button
           onClick={() => {
             handleHideDialog();
             deleteWord();
@@ -214,13 +220,13 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
            color="primary">
             Yes
           </Button> */}
-        </DialogActions>
-      </Dialog>
+          </DialogActions>
+        </Dialog>
         {quizLoaded ? (
           <Grid container className={classes.container}>
             {/* Question */}
             <Grid container className={classes.question}>
-              <Typography>{`${questionNumber+1}. The meaning of ${
+              <Typography>{`${questionNumber + 1}. The meaning of ${
                 quiz[questionNumber].word_title
               } is`}</Typography>
             </Grid>
@@ -247,7 +253,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         quiz[questionNumber].word_correct_def
                       ) {
                         myConsole.log('Correct');
-                        setScore(score+1);
+                        setScore(score + 1);
                         setColours([
                           'lightgreen',
                           'transparent',
@@ -255,8 +261,12 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                           'transparent',
                         ]);
                       } else {
-                        myConsole.log("quiz[questionNumber].options[0] " + quiz[questionNumber].options[0]);
-                        myConsole.log("quiz[questionNumber].word_correct_def" +  quiz[questionNumber].word_correct_def);
+                        myConsole.log(
+                          `quiz[questionNumber].options[0] ${quiz[questionNumber].options[0]}`
+                        );
+                        myConsole.log(
+                          `quiz[questionNumber].word_correct_def${quiz[questionNumber].word_correct_def}`
+                        );
                         let ans: number;
                         let i: number;
                         for (i in quiz[questionNumber].options) {
@@ -265,7 +275,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                             quiz[questionNumber].word_correct_def
                           ) {
                             ans = i;
-                            myConsole.log('Ans found '+ans);
+                            myConsole.log(`Ans found ${ans}`);
                             break;
                           }
                         }
@@ -309,7 +319,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         quiz[questionNumber].word_correct_def
                       ) {
                         myConsole.log('C');
-                        setScore(score+1);
+                        setScore(score + 1);
 
                         setColours([
                           'transparent',
@@ -318,8 +328,12 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                           'transparent',
                         ]);
                       } else {
-                        myConsole.log("quiz[questionNumber].options[1] " + quiz[questionNumber].options[1]);
-                        myConsole.log("quiz[questionNumber].word_correct_def" +  quiz[questionNumber].word_correct_def);
+                        myConsole.log(
+                          `quiz[questionNumber].options[1] ${quiz[questionNumber].options[1]}`
+                        );
+                        myConsole.log(
+                          `quiz[questionNumber].word_correct_def${quiz[questionNumber].word_correct_def}`
+                        );
                         let ans: number;
                         myConsole.log('i');
                         let i: number;
@@ -329,7 +343,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                             quiz[questionNumber].word_correct_def
                           ) {
                             ans = i;
-                            myConsole.log('Ans found '+ans);
+                            myConsole.log(`Ans found ${ans}`);
 
                             break;
                           }
@@ -377,7 +391,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         quiz[questionNumber].word_correct_def
                       ) {
                         myConsole.log('c');
-                        setScore(score+1);
+                        setScore(score + 1);
 
                         setColours([
                           'transparent',
@@ -386,8 +400,12 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                           'transparent',
                         ]);
                       } else {
-                        myConsole.log("quiz[questionNumber].options[2] " + quiz[questionNumber].options[2]);
-                        myConsole.log("quiz[questionNumber].word_correct_def" +  quiz[questionNumber].word_correct_def);
+                        myConsole.log(
+                          `quiz[questionNumber].options[2] ${quiz[questionNumber].options[2]}`
+                        );
+                        myConsole.log(
+                          `quiz[questionNumber].word_correct_def${quiz[questionNumber].word_correct_def}`
+                        );
                         myConsole.log('i');
                         let ans: number;
                         let i: number;
@@ -397,7 +415,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                             quiz[questionNumber].word_correct_def
                           ) {
                             ans = i;
-                            myConsole.log('Ans found '+ans);
+                            myConsole.log(`Ans found ${ans}`);
 
                             break;
                           }
@@ -446,7 +464,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                         quiz[questionNumber].word_correct_def
                       ) {
                         myConsole.log('c');
-                        setScore(score+1);
+                        setScore(score + 1);
 
                         setColours([
                           'transparent',
@@ -455,8 +473,12 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                           'lightgreen',
                         ]);
                       } else {
-                        myConsole.log("quiz[questionNumber].options[3] " + quiz[questionNumber].options[3]);
-                        myConsole.log("quiz[questionNumber].word_correct_def" +  quiz[questionNumber].word_correct_def);
+                        myConsole.log(
+                          `quiz[questionNumber].options[3] ${quiz[questionNumber].options[3]}`
+                        );
+                        myConsole.log(
+                          `quiz[questionNumber].word_correct_def${quiz[questionNumber].word_correct_def}`
+                        );
                         myConsole.log('i');
                         let ans: number;
 
@@ -467,7 +489,7 @@ const Quiz: React.FC<Props> = ({ setId,setCurrentRound,userEmail }) => {
                             quiz[questionNumber].word_correct_def
                           ) {
                             ans = i;
-                            myConsole.log('Ans found '+ans);
+                            myConsole.log(`Ans found ${ans}`);
 
                             break;
                           }

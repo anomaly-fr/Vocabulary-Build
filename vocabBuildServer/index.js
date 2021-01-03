@@ -204,10 +204,19 @@ app.get("/api/getWordsBySetNo/:set_id", (req, res) => {
 // Delete word
 app.delete("/api/deleteWordByWordId/:word_id", (req, res) => {
     const wordID = req.params.word_id;
+    const setID = req.body.set_id;
     const sqlDelete = "DELETE FROM word WHERE word_id=?";
+    const sqlUpdate = "UPDATE level_set SET number_of_words=(number_of_words-1) WHERE set_id =?";
     db.query(sqlDelete, [wordID], (error, result) => {
         console.log("Result " + result);
         console.log("Error " + error);
+
+        db.query(sqlUpdate,[setID],(e,r) => {
+            console.log("Result " + r);
+            console.log("Error " + e);
+    
+
+        })
 
         res.json(result);
     })
@@ -264,10 +273,10 @@ app.get("/api/getWordsBySetId/:set_id", (req, res) => {
 
 // get number of words in set
 app.get("/api/getNumberOfWordsBySetId/:set_id", (req, res) => {
-    const sqlSelect = "SELECT COUNT(set_id) AS number_of_words FROM word WHERE set_id=? GROUP BY (set_id);";
+    const sqlSelect = "SELECT number_of_words FROM vocab_builder.level_set where set_id=?";
     const set_id = req.params.set_id;
     db.query(sqlSelect, [set_id], (error, result) => {
-        console.log("Result " + result);
+        console.log("Result " + JSON.stringify(result));
         console.log("Error " + error);
 
         res.json(result);

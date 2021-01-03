@@ -31,8 +31,7 @@ export default function Home() {
   useEffect(() => {
     myConsole.log(`Welcome ${location.state.email}`);
     setEmail(location.state.email);
-    window.localStorage.setItem("email", JSON.stringify(email));
-    window.localStorage.setItem("userType", "tutee");
+
     // console.log(JSON.parse(window.localStorage.getItem("user")));
     setName(location.state.name);
  }, []);

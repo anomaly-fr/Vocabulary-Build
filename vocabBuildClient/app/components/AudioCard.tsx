@@ -100,6 +100,7 @@ const AudioCard: React.FC<Props> = ({setCurrentRound,setId}) => {
   const [bestScore,setBestScore] = useState<number>(0);
   const [text,setText] = useState<string>('');
   const [answered,setAnswered] = useState<boolean>(false);
+  const [numberOfWords,setNumberOfWords] = useState<number>(0);
 
   // myConsole.log(voices.length)
 
@@ -140,6 +141,17 @@ const fetchWords = () => {
       let temp = response.data;
       setWords(temp);
    //   setQuizLoaded(true);
+   Axios.get(`http://localhost:3000/api/getNumberOfWordsBySetId/${setId}`)
+   .then((res) => {
+     myConsole.log(`Number ${JSON.stringify(res.data)}`);
+     setNumberOfWords(res.data[0].number_of_words);
+
+     myConsole.log(setId);
+   })
+   .catch((e) => {
+   });
+
+
       return myConsole.log(response.data);
     })
     .catch((e) => {
@@ -191,7 +203,7 @@ const updateScore = () => {
         <DialogTitle id="alert-dialog-slide-title">{"Audio Round Completed!"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-  {`You scored ${score}/${words.length}! Your best score for this set is ${bestScore}`}
+  {`You scored ${score}/${numberOfWords}! Your best score for this set is ${bestScore}`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -284,7 +296,7 @@ const updateScore = () => {
      <Grid item style={{alignItems: 'center',justifyContent: 'space-between'}}>
        <Grid
        onClick={() => {
-          if(questionNumber + 1 !== words.length){
+          if(questionNumber + 1 !== numberOfWords){
             setQuestionNumber(questionNumber+1)
             setSpelling('')
             setText('')
