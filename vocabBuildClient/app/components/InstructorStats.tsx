@@ -107,7 +107,7 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
 
       let setFinalStat = {
         ...response.data,
-        total: resp.data
+        total: resp.data*2
       }
       setSetStat(setFinalStat);
 
@@ -131,7 +131,7 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
       .then((response) => {
 
        setStats(response.data)
-        return myConsole.log("stats "+response.data);
+        return myConsole.log("statsSS "+JSON.stringify(response.data));
       })
       .catch((e) => {
         myConsole.log(e);
@@ -171,7 +171,7 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
           />
          <Grid style={{height:40,alignItems:'center',justifyContent:'center',margin:'1%'}}>
          <Typography style={{fontSize:12,color:'black'}}>{`${bar.name}`}</Typography>
-         <Typography style={{fontSize:12,color:'black'}}>{`(set total: ${bar.mark})`}</Typography>
+         <Typography style={{fontSize:12,color:'black'}}>{`(total: ${bar.mark})`}</Typography>
 
          </Grid>
       </Grid>)
@@ -228,27 +228,27 @@ const InstructorStats: React.FC<Props> = ({ tutorEmail,setCurrentMenuItem }) => 
               <Grid container justify='space-between' style={{backgroundColor:theme.palette.primary.dark,borderRadius:10,margin:'1.5%',padding:'2%',alignSelf:'center',width:'90%'}}>
                   <Grid container justify='space-between'>
                     <Typography style={{color:'white',fontWeight:'bold'}} >Highest Audio Score</Typography>
-                    <Typography style={{color:'white'}}>{stat.highest_audio_score}</Typography>
+                    <Typography style={{color:'white'}}>{`${stat.highest_audio_score}/${stat.number_of_words}`}</Typography>
                     </Grid>
                     <Grid container justify='space-between' style={{backgroundColor:theme.palette.primary.dark}}>
                     <Typography style={{color:'white',fontWeight:'bold'}} >Highest quiz Score</Typography>
-                    <Typography style={{color:'white'}}>{stat.highest_quiz_score}</Typography>
+                    <Typography style={{color:'white'}}>{`${stat.highest_quiz_score}/${stat.number_of_words}`}</Typography>
                     </Grid>
                     <Grid container justify='space-between' style={{backgroundColor:theme.palette.primary.dark}}>
                     <Typography style={{color:'white',fontWeight:'bold'}} >Average Audio Score</Typography>
-                    <Typography style={{color:'white'}}>{stat.average_audio_score}</Typography>
+                    <Typography style={{color:'white'}}>{`${stat.average_audio_score}/${stat.number_of_words}`}</Typography>
                     </Grid>
                     <Grid container justify='space-between' style={{backgroundColor:theme.palette.primary.dark}}>
                     <Typography style={{color:'white',fontWeight:'bold'}} >Average Audio Score</Typography>
-                    <Typography style={{color:'white'}}>{stat.average_audio_score}</Typography>
+                    <Typography style={{color:'white'}}>{`${stat.average_audio_score}/${stat.number_of_words}`}</Typography>
                     </Grid>
                     <Grid container justify='space-between' style={{backgroundColor:theme.palette.primary.dark}}>
                     <Typography style={{color:'white',fontWeight:'bold'}} >Best Total</Typography>
-                    <Typography style={{color:'white'}}>{stat.best_total}</Typography>
+                    <Typography style={{color:'white'}}>{`${stat.best_total}/${stat.number_of_words}`}</Typography>
                     </Grid>
                     <Grid container justify='space-between' style={{backgroundColor:theme.palette.primary.dark}}>
                     <Typography style={{color:'white',fontWeight:'bold'}} >Average Total</Typography>
-                    <Typography style={{color:'white'}}>{stat.average_total}</Typography>
+                    <Typography style={{color:'white'}}>{`${stat.average_total}/${stat.number_of_words}`}</Typography>
                   </Grid>
                   <Grid container style={{justifyContent:'flex-end'}}>
                   <Grid item style={{ justifyContent:'flex-end', padding:5,backgroundColor:theme.palette.primary.light,borderRadius:5}}>

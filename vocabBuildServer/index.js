@@ -202,23 +202,23 @@ app.get("/api/getWordsBySetNo/:set_id", (req, res) => {
 });
 
 // Delete word
-app.delete("/api/deleteWordByWordId/:word_id", (req, res) => {
+app.post("/api/deleteWordByWordId/:word_id", (req, res) => {
     const wordID = req.params.word_id;
     const setID = req.body.set_id;
     const sqlDelete = "DELETE FROM word WHERE word_id=?";
     const sqlUpdate = "UPDATE level_set SET number_of_words=(number_of_words-1) WHERE set_id =?";
     db.query(sqlDelete, [wordID], (error, result) => {
-        console.log("Result " + result);
+        console.log("Deleted " + result);
         console.log("Error " + error);
 
         db.query(sqlUpdate,[setID],(e,r) => {
-            console.log("Result " + r);
+            console.log("Updated "+setID +" "+ r);
             console.log("Error " + e);
-    
+            res.json(r);
+
 
         })
 
-        res.json(result);
     })
 
 });
@@ -381,7 +381,7 @@ app.get("/api/getLevelLeaderboard/:level_id", (req, res) => {
 
 // Get tutor stats
 app.get("/api/getTutorStats/:tutor_email", (req, res) => {
-    const sqlSelect = "select tutor_email,level_id,level_name,set_id,set_name,max(best_score_quiz) as highest_quiz_score,avg(best_score_quiz) as average_quiz_score,max(best_score_audio) as highest_audio_score,avg(best_score_audio) as average_quiz_score,avg(best_score_audio) as average_audio_score,max(total) as best_total,avg(total) as average_total from full_tutor_analysis where tutor_email=?  group by set_id ORDER BY level_name;"
+    const sqlSelect = "select tutor_email,level_id,level_name,set_id,set_name,number_of_words,max(best_score_quiz) as highest_quiz_score,avg(best_score_quiz) as average_quiz_score,max(best_score_audio) as highest_audio_score,avg(best_score_audio) as average_quiz_score,avg(best_score_audio) as average_audio_score,max(total) as best_total,avg(total) as average_total from full_tutor_analysis where tutor_email=? group by set_id ORDER BY level_name;"
     // const sqlSelect = "SELECT TUTOR_email,level_id,level_name,set_id,set_name,MAX(best_score_quiz) AS highest_quiz_score,AVG(best_score_quiz) AS average_quiz_score, MAX(best_score_audio) as highest_audio_score,AVG(best_score_quiz) AS average_quiz_score,MAX(total) AS best_total,AVG(total) AS average_total FROM full_tutor_analysis WHERE tutor_email=? GROUP BY set_id ORDER BY level_name;";
     const tutorEmail = req.params.tutor_email;
     db.query(sqlSelect, [tutorEmail], (error, result) => {
@@ -396,8 +396,9 @@ app.get("/api/getTutorStats/:tutor_email", (req, res) => {
 
 
 // Get per set stats for tutors
+// multiple join
 app.get("/api/getTutorSetWiseStats/:set_id", (req, res) => {
-    const sqlSelect = "select score.email,name,set_id,best_score_audio,best_score_quiz from score join tutee using(email) where set_id=?;";
+    const sqlSelect = "select score.email,name,set_id,number_of_words,best_score_audio,best_score_quiz from score join tutee using (email) join level_set using(set_id) where set_id=?;";
     // const sqlSelect = "SELECT TUTOR_email,level_id,level_name,set_id,set_name,MAX(best_score_quiz) AS highest_quiz_score,AVG(best_score_quiz) AS average_quiz_score, MAX(best_score_audio) as highest_audio_score,AVG(best_score_quiz) AS average_quiz_score,MAX(total) AS best_total,AVG(total) AS average_total FROM full_tutor_analysis WHERE tutor_email=? GROUP BY set_id ORDER BY level_name;";
     const setId = req.params.set_id;
     db.query(sqlSelect, [setId], (error, result) => {
@@ -424,10 +425,26 @@ app.get("/api/getLeaderboard", (req, res) => {
 
 });
 
-app.put("/api/markLookUp", (req, res) => {
-    const sqlUpdate = "UPDATE tutee SET look_ups = (look_ups+1) WHERE email=?;";
+app.post("/api/markLookUp", (req, res) => {
+    const sqlUpdate = "INSERT INTO dictionary VALUES (?,?);";
     const email = req.body.user_email;
-    db.query(sqlUpdate,[email], (error, result) => {
+    const word = req.body.search_term;
+    db.query(sqlUpdate,[email,word], (error, result) => {
+        console.log("Done " + result);
+        console.log("Error " + error);
+
+        res.json(result);
+
+    });
+
+});
+
+
+// fetch all words ordered
+app.get("/api/getAllWords", (req, res) => {
+    const sqlSelect = "SELECT word_title,word_correct_def FROM word USE INDEX(all_words_ordered);";
+    
+    db.query(sqlSelect, (error, result) => {
         console.log("Result " + result);
         console.log("Error " + error);
 

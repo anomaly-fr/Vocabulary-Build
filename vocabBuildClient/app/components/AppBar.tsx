@@ -147,8 +147,9 @@ const TopBar: React.FC<Props> = ({ name, logout, userType }) => {
   const markLookUp = () => {
     'email ' + JSON.parse(window.localStorage.getItem('email'));
 
-    Axios.put('http://localhost:3000/api/markLookUp', {
+    Axios.post('http://localhost:3000/api/markLookUp', {
       user_email: JSON.parse(window.localStorage.getItem('email')),
+      search_term: searchTerm,
     })
       .then((response) => {
         isWordSearchActive(false);
@@ -189,7 +190,6 @@ const TopBar: React.FC<Props> = ({ name, logout, userType }) => {
                   open={Boolean(anchorEl)}
                   onClose={handleClose}
                 >
-                  <MenuItem>Profile</MenuItem>
                   <MenuItem onClick={handleClose}>Logout</MenuItem>
                 </Menu>
               </div>

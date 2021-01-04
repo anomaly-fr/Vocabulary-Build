@@ -157,8 +157,8 @@ const AddWords : React.FC<Props> = ({levelNo,setNo,setSetSel}) => {
   };
 
   const deleteWord = () => {
-    myConsole.log('delete');
-    Axios.delete(`http://localhost:3000/api/deleteWordByWordId/${currentWord.word_id}`,{
+    myConsole.log('delete '+ setNo);
+    Axios.post(`http://localhost:3000/api/deleteWordByWordId/${currentWord.word_id}`,{
       set_id:setNo
     })
     .then((response) => {
