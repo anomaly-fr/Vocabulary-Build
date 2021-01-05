@@ -409,7 +409,7 @@ const Levels: React.FC<Props> = ({
                             alignSelf: 'center',
                           }}
                         >
-                          {`${(inx + 1).toString()}. Level ${row.name}`}
+                          {`${(inx + 1).toString()}. ${row.name}`}
                         </DialogContentText>
 
                         <DialogContentText
