@@ -286,7 +286,7 @@ app.get("/api/getNumberOfWordsBySetId/:set_id", (req, res) => {
 });
 
 
-
+ // git test
 // update best score
 app.post("/api/updateBestScore/:score_type", (req, res) => {
     const set_id = req.body.set_id;
