@@ -1,2 +1,2 @@
 # Vocabulary-Build
-A Vocabulary Building application.
+A Vocabulary Building desktop application made using Electron.
